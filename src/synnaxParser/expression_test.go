@@ -108,6 +108,87 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 			want:    float64(0x123 + 345),
 			wantErr: false,
 		},
+		{
+			name: "-b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "-345",
+				parameters: MapParameters{},
+			},
+			want:    float64(-345),
+			wantErr: false,
+		},
+		{
+			name: "a-b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "123-345",
+				parameters: MapParameters{},
+			},
+			want:    float64(123 - 345),
+			wantErr: false,
+		},
+		{
+			name: "a*b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "123*345",
+				parameters: MapParameters{},
+			},
+			want:    float64(123 * 345),
+			wantErr: false,
+		},
+		{
+			name: "a > b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "123 > 345",
+				parameters: MapParameters{},
+			},
+			want:    bool(123 > 345),
+			wantErr: false,
+		},
+		{
+			name: "a < b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "123 < 345",
+				parameters: MapParameters{},
+			},
+			want:    bool(123 < 345),
+			wantErr: false,
+		},
+		{
+			name: "a < b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "a1 < a2",
+				parameters: MapParameters{
+					"a1": 123,
+					"a2": 345,
+				},
+			},
+			want:    bool(123 < 345),
+			wantErr: false,
+		},
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {

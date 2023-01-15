@@ -88,118 +88,153 @@ func (ge *goExpreesionVisitor) VisitExpression(ctx *parser.ExpressionContext) in
 
 	if ctx.GetChildCount() == 3 {
 		//oper, _ := ctx.GetChild(0).GetChild(1).(antlr.TerminalNode)
-
 		leftNode := ctx.GetChildOfType(0, nil)
 		node.LeftOperator = leftNode.Accept(ge).(*evaluationNode)
 		rightNode := ctx.GetChildOfType(2, nil)
 		node.RightOperator = rightNode.Accept(ge).(*evaluationNode)
 
-		{
+		if ctx.PLUS() != nil {
+			node.Symbol = PLUS
+			node.Operator = addOperator
 			node.LeftTypeCheck = nil
 			node.RightTypeCheck = nil
 			node.TypeCheck = additionTypeCheck
-			if ctx.PLUS() != nil {
-				node.Symbol = PLUS
-				node.Operator = addOperator
-			}
 		}
 
-		{
+		if ctx.STAR() != nil {
+			node.Symbol = STAR
+			node.Operator = multiplyOperator
 			node.LeftTypeCheck = isFloat64
 			node.RightTypeCheck = isFloat64
 			node.TypeCheck = nil
-			if ctx.STAR() != nil {
-				node.Symbol = STAR
-				node.Operator = multiplyOperator
-			}
-			if ctx.DIV() != nil {
-				node.Symbol = DIV
-				node.Operator = divideOperator
-			}
-			if ctx.MOD() != nil {
-				node.Symbol = MOD
-				node.Operator = modulusOperator
-			}
-
-			if ctx.LSHIFT() != nil {
-				node.Symbol = LSHIFT
-				node.Operator = leftShiftOperator
-			}
-
-			if ctx.RSHIFT() != nil {
-				node.Symbol = RSHIFT
-				node.Operator = rightShiftOperator
-			}
-
-			if ctx.AMPERSAND() != nil {
-				node.Symbol = AMPERSAND
-				node.Operator = bitwiseAndOperator
-			}
-
-			if ctx.BIT_CLEAR() != nil {
-				node.Symbol = BIT_CLEAR
-				node.Operator = bitwiseAndNotOperator
-			}
-
-			if ctx.MINUS() != nil {
-				node.Symbol = MINUS
-				node.Operator = subtractOperator
-			}
-			if ctx.OR() != nil {
-				node.Symbol = OR
-				node.Operator = bitwiseOrOperator
-			}
-			if ctx.CARET() != nil {
-				node.Symbol = CARET
-				node.Operator = bitwiseXOROperator
-			}
+		}
+		if ctx.DIV() != nil {
+			node.Symbol = DIV
+			node.Operator = divideOperator
+			node.LeftTypeCheck = isFloat64
+			node.RightTypeCheck = isFloat64
+			node.TypeCheck = nil
+		}
+		if ctx.MOD() != nil {
+			node.Symbol = MOD
+			node.Operator = modulusOperator
+			node.LeftTypeCheck = isFloat64
+			node.RightTypeCheck = isFloat64
+			node.TypeCheck = nil
 		}
 
-		{
+		if ctx.LSHIFT() != nil {
+			node.Symbol = LSHIFT
+			node.Operator = leftShiftOperator
+			node.LeftTypeCheck = isFloat64
+			node.RightTypeCheck = isFloat64
+			node.TypeCheck = nil
+		}
+
+		if ctx.RSHIFT() != nil {
+			node.Symbol = RSHIFT
+			node.Operator = rightShiftOperator
+			node.LeftTypeCheck = isFloat64
+			node.RightTypeCheck = isFloat64
+			node.TypeCheck = nil
+		}
+
+		if ctx.AMPERSAND() != nil {
+			node.Symbol = AMPERSAND
+			node.Operator = bitwiseAndOperator
+			node.LeftTypeCheck = isFloat64
+			node.RightTypeCheck = isFloat64
+			node.TypeCheck = nil
+		}
+
+		if ctx.BIT_CLEAR() != nil {
+			node.Symbol = BIT_CLEAR
+			node.Operator = bitwiseAndNotOperator
+			node.LeftTypeCheck = isFloat64
+			node.RightTypeCheck = isFloat64
+			node.TypeCheck = nil
+		}
+
+		if ctx.MINUS() != nil {
+			node.Symbol = MINUS
+			node.Operator = subtractOperator
+			node.LeftTypeCheck = isFloat64
+			node.RightTypeCheck = isFloat64
+			node.TypeCheck = nil
+		}
+		if ctx.OR() != nil {
+			node.Symbol = OR
+			node.Operator = bitwiseOrOperator
+			node.LeftTypeCheck = isFloat64
+			node.RightTypeCheck = isFloat64
+			node.TypeCheck = nil
+		}
+		if ctx.CARET() != nil {
+			node.Symbol = CARET
+			node.Operator = bitwiseXOROperator
+			node.LeftTypeCheck = isFloat64
+			node.RightTypeCheck = isFloat64
+			node.TypeCheck = nil
+		}
+
+		if ctx.EQUALS() != nil {
+			node.Symbol = EQUALS
+			node.Operator = equalOperator
 			node.LeftTypeCheck = nil
 			node.RightTypeCheck = nil
 			node.TypeCheck = comparatorTypeCheck
-
-			if ctx.EQUALS() != nil {
-				node.Symbol = EQUALS
-				node.Operator = equalOperator
-			}
-
-			if ctx.NOT_EQUALS() != nil {
-				node.Symbol = NOT_EQUALS
-				node.Operator = notEqualOperator
-			}
-			if ctx.LESS() != nil {
-				node.Symbol = LESS
-				node.Operator = ltOperator
-			}
-			if ctx.LESS_OR_EQUALS() != nil {
-				node.Symbol = LESS_OR_EQUALS
-				node.Operator = lteOperator
-			}
-			if ctx.GREATER() != nil {
-				node.Symbol = GREATER
-				node.Operator = gtOperator
-			}
-			if ctx.GREATER_OR_EQUALS() != nil {
-				node.Symbol = GREATER_OR_EQUALS
-				node.Operator = gteOperator
-			}
 		}
 
-		{
+		if ctx.NOT_EQUALS() != nil {
+			node.Symbol = NOT_EQUALS
+			node.Operator = notEqualOperator
+			node.LeftTypeCheck = nil
+			node.RightTypeCheck = nil
+			node.TypeCheck = comparatorTypeCheck
+		}
+		if ctx.LESS() != nil {
+			node.Symbol = LESS
+			node.Operator = ltOperator
+			node.LeftTypeCheck = nil
+			node.RightTypeCheck = nil
+			node.TypeCheck = comparatorTypeCheck
+		}
+		if ctx.LESS_OR_EQUALS() != nil {
+			node.Symbol = LESS_OR_EQUALS
+			node.Operator = lteOperator
+			node.LeftTypeCheck = nil
+			node.RightTypeCheck = nil
+			node.TypeCheck = comparatorTypeCheck
+		}
+		if ctx.GREATER() != nil {
+			node.Symbol = GREATER
+			node.Operator = gtOperator
+			node.LeftTypeCheck = nil
+			node.RightTypeCheck = nil
+			node.TypeCheck = comparatorTypeCheck
+		}
+		if ctx.GREATER_OR_EQUALS() != nil {
+			node.Symbol = GREATER_OR_EQUALS
+			node.Operator = gteOperator
+			node.LeftTypeCheck = nil
+			node.RightTypeCheck = nil
+			node.TypeCheck = comparatorTypeCheck
+		}
+
+		if ctx.LOGICAL_AND() != nil || ctx.EN_AND() != nil {
+			node.Symbol = LOGICAL_AND
+			node.Operator = andOperator
 			node.LeftTypeCheck = isBool
 			node.RightTypeCheck = isBool
 			node.TypeCheck = nil
-			if ctx.LOGICAL_AND() != nil || ctx.EN_AND() != nil {
-				node.Symbol = LOGICAL_AND
-				node.Operator = andOperator
-			}
+		}
 
-			if ctx.LOGICAL_OR() != nil || ctx.EN_OR() != nil {
-				node.Symbol = LOGICAL_OR
-				node.Operator = orOperator
-			}
+		if ctx.LOGICAL_OR() != nil || ctx.EN_OR() != nil {
+			node.Symbol = LOGICAL_OR
+			node.Operator = orOperator
+			node.LeftTypeCheck = isBool
+			node.RightTypeCheck = isBool
+			node.TypeCheck = nil
 		}
 
 	}
