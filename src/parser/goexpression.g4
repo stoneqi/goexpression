@@ -159,7 +159,7 @@ AMPERSAND              : '&';
 
 DECIMAL_LIT            : ('0' | [1-9] ('_'? [0-9])*);
 BINARY_LIT             : '0' [bB] ('_'? BIN_DIGIT)+;
-OCTAL_LIT              : '0' [oO]? ('_'? OCTAL_DIGIT)+;
+OCTAL_LIT              : '0' [oO] ('_'? OCTAL_DIGIT)+;
 HEX_LIT                : '0' [xX]  ('_'? HEX_DIGIT)+;
 
 

@@ -8,23 +8,29 @@ import (
 const shortCircuitHolder int = -1
 
 type EvaluableExpression struct {
+	stage       *evaluationNode
 	ChecksTypes bool
 }
 
-func (this EvaluableExpression) evaluateStage(stage *evaluationNode, parameters Parameters) (interface{}, error) {
+func (ee *EvaluableExpression) EvalString(expression string, parameters Parameters) (interface{}, error) {
+	ee.stage, _ = VisitorParserString(expression)
+	return ee.evaluateStage(ee.stage, parameters)
+}
+
+func (ee *EvaluableExpression) evaluateStage(stage *evaluationNode, parameters Parameters) (interface{}, error) {
 
 	var left, right interface{}
 	var err error
 
-	if stage.leftOperator != nil {
-		left, err = this.evaluateStage(stage.leftOperator, parameters)
+	if stage.LeftOperator != nil {
+		left, err = ee.evaluateStage(stage.LeftOperator, parameters)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	if stage.isShortCircuitable() {
-		switch stage.symbol {
+		switch stage.Symbol {
 		case LOGICAL_AND:
 			if left == false {
 				return false, nil
@@ -50,38 +56,38 @@ func (this EvaluableExpression) evaluateStage(stage *evaluationNode, parameters 
 		}
 	}
 
-	if right != shortCircuitHolder && stage.rightOperator != nil {
-		right, err = this.evaluateStage(stage.rightOperator, parameters)
+	if right != shortCircuitHolder && stage.RightOperator != nil {
+		right, err = ee.evaluateStage(stage.RightOperator, parameters)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	if this.ChecksTypes {
-		if stage.typeCheck == nil {
+	if ee.ChecksTypes {
+		if stage.TypeCheck == nil {
 
-			err = typeCheck(stage.leftTypeCheck, left, stage.symbol, stage.typeErrorFormat)
+			err = typeCheck(stage.LeftTypeCheck, left, stage.Symbol, stage.TypeErrorFormat)
 			if err != nil {
 				return nil, err
 			}
 
-			err = typeCheck(stage.rightTypeCheck, right, stage.symbol, stage.typeErrorFormat)
+			err = typeCheck(stage.RightTypeCheck, right, stage.Symbol, stage.TypeErrorFormat)
 			if err != nil {
 				return nil, err
 			}
 		} else {
-			// special case where the type check needs to know both sides to determine if the operator can handle it
-			if !stage.typeCheck(left, right) {
-				errorMsg := fmt.Sprintf(stage.typeErrorFormat, left, stage.symbol.String())
+			// special case where the type check needs to know both sides to determine if the Operator can handle it
+			if !stage.TypeCheck(left, right) {
+				errorMsg := fmt.Sprintf(stage.TypeErrorFormat, left, stage.Symbol.String())
 				return nil, errors.New(errorMsg)
 			}
 		}
 	}
 
-	return stage.operator(left, right, parameters)
+	return stage.Operator(left, right, parameters)
 }
 
-func typeCheck(check stageTypeCheck, value interface{}, symbol OperatorSymbol, format string) error {
+func typeCheck(check StageTypeCheck, value interface{}, symbol OperatorSymbol, format string) error {
 
 	if check == nil {
 		return nil

@@ -14,6 +14,22 @@ var (
 	_false = interface{}(false)
 )
 
+// left
+func leftOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+	return left, nil
+}
+
+// right
+func rightOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+	return right, nil
+}
+
+// 加法： +2=2
+func unAryAddOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+
+	return right.(float64), nil
+}
+
 // 加法： "a"+"b" = "ab"; 1+2=3
 func addOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
 
@@ -174,6 +190,11 @@ func bitwiseXOROperator(left interface{}, right interface{}, parameters Paramete
 	return float64(int64(left.(float64)) ^ int64(right.(float64))), nil
 }
 
+// 位清零
+func bitwiseAndNotOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+	return float64(int64(left.(float64)) &^ int64(right.(float64))), nil
+}
+
 // 左移
 func leftShiftOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
 	return float64(uint64(left.(float64)) << uint64(right.(float64))), nil
@@ -185,7 +206,7 @@ func rightShiftOperator(left interface{}, right interface{}, parameters Paramete
 }
 
 // 获取参数值
-func makeParameterOperator(parameterName string) evaluationOperator {
+func makeParameterOperator(parameterName string) EvaluationOperator {
 
 	return func(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
 		value, err := parameters.Get(parameterName)
@@ -198,14 +219,14 @@ func makeParameterOperator(parameterName string) evaluationOperator {
 }
 
 // liter值
-func makeLiteralOperator(literal interface{}) evaluationOperator {
+func makeLiteralOperator(literal interface{}) EvaluationOperator {
 	return func(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
 		return literal, nil
 	}
 }
 
 // 函数执行
-func makeFunctionOperator(function ExpressionFunction) evaluationOperator {
+func makeFunctionOperator(function ExpressionFunction) EvaluationOperator {
 
 	return func(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
 
@@ -220,6 +241,75 @@ func makeFunctionOperator(function ExpressionFunction) evaluationOperator {
 			return function(right)
 		}
 	}
+}
+
+// 函数执行
+func makeExpressionListOperator(expression []*evaluationNode) EvaluationOperator {
+	return func(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+		res := make([]interface{}, 0, len(expression))
+		for _, node := range expression {
+			stage, err := evaluateStage(node, parameters)
+			if err != nil {
+				return nil, err
+			}
+			res = append(res, stage)
+		}
+		return res, nil
+	}
+}
+
+func evaluateStage(stage *evaluationNode, parameters Parameters) (interface{}, error) {
+
+	var left, right interface{}
+	var err error
+
+	if stage.LeftOperator != nil {
+		left, err = evaluateStage(stage.LeftOperator, parameters)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if stage.isShortCircuitable() {
+		switch stage.Symbol {
+		case LOGICAL_AND:
+			if left == false {
+				return false, nil
+			}
+		case LOGICAL_OR:
+			if left == true {
+				return true, nil
+			}
+		}
+	}
+
+	if right != shortCircuitHolder && stage.RightOperator != nil {
+		right, err = evaluateStage(stage.RightOperator, parameters)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if stage.TypeCheck == nil {
+
+		err = typeCheck(stage.LeftTypeCheck, left, stage.Symbol, stage.TypeErrorFormat)
+		if err != nil {
+			return nil, err
+		}
+
+		err = typeCheck(stage.RightTypeCheck, right, stage.Symbol, stage.TypeErrorFormat)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		// special case where the type check needs to know both sides to determine if the Operator can handle it
+		if !stage.TypeCheck(left, right) {
+			errorMsg := fmt.Sprintf(stage.TypeErrorFormat, left, stage.Symbol.String())
+			return nil, errors.New(errorMsg)
+		}
+	}
+
+	return stage.Operator(left, right, parameters)
 }
 
 // 类型转换
@@ -267,7 +357,7 @@ func typeConvertParams(method reflect.Value, params []reflect.Value) ([]reflect.
 }
 
 // 访问参数 a.b.c
-func makeAccessorOperator(pair []string) evaluationOperator {
+func makeAccessorOperator(pair []string) EvaluationOperator {
 
 	reconstructed := strings.Join(pair, ".")
 

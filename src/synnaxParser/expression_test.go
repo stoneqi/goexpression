@@ -27,32 +27,32 @@ func TestEvaluableExpression_evaluateStage(t *testing.T) {
 			},
 			args: args{
 				stage: &evaluationNode{
-					symbol: 0,
-					leftOperator: &evaluationNode{
-						symbol:          LITERAL,
-						leftOperator:    nil,
-						rightOperator:   nil,
-						operator:        makeAccessorOperator([]string{"a"}),
-						leftTypeCheck:   nil,
-						rightTypeCheck:  nil,
-						typeCheck:       nil,
-						typeErrorFormat: "",
+					Symbol: 0,
+					LeftOperator: &evaluationNode{
+						Symbol:          LITERAL,
+						LeftOperator:    nil,
+						RightOperator:   nil,
+						Operator:        makeAccessorOperator([]string{"a"}),
+						LeftTypeCheck:   nil,
+						RightTypeCheck:  nil,
+						TypeCheck:       nil,
+						TypeErrorFormat: "",
 					},
-					rightOperator: &evaluationNode{
-						symbol:          LITERAL,
-						leftOperator:    nil,
-						rightOperator:   nil,
-						operator:        makeLiteralOperator(345.0),
-						leftTypeCheck:   nil,
-						rightTypeCheck:  nil,
-						typeCheck:       nil,
-						typeErrorFormat: "",
+					RightOperator: &evaluationNode{
+						Symbol:          LITERAL,
+						LeftOperator:    nil,
+						RightOperator:   nil,
+						Operator:        makeLiteralOperator(345.0),
+						LeftTypeCheck:   nil,
+						RightTypeCheck:  nil,
+						TypeCheck:       nil,
+						TypeErrorFormat: "",
 					},
-					operator:        addOperator,
-					leftTypeCheck:   isFloat64,
-					rightTypeCheck:  isFloat64,
-					typeCheck:       nil,
-					typeErrorFormat: "",
+					Operator:        addOperator,
+					LeftTypeCheck:   isFloat64,
+					RightTypeCheck:  isFloat64,
+					TypeCheck:       nil,
+					TypeErrorFormat: "",
 				},
 				parameters: MapParameters{
 					"a": 123,
@@ -74,6 +74,55 @@ func TestEvaluableExpression_evaluateStage(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("evaluateStage() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestEvaluableExpression_EvalString(t *testing.T) {
+	type fields struct {
+		stage       *evaluationNode
+		ChecksTypes bool
+	}
+	type args struct {
+		expression string
+		parameters Parameters
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    interface{}
+		wantErr bool
+	}{
+		{
+			name: "a+b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "0x123+345",
+				parameters: MapParameters{},
+			},
+			want:    float64(0x123 + 345),
+			wantErr: false,
+		},
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ee := &EvaluableExpression{
+				stage:       tt.fields.stage,
+				ChecksTypes: tt.fields.ChecksTypes,
+			}
+			got, err := ee.EvalString(tt.args.expression, tt.args.parameters)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("EvalString() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("EvalString() got = %v, want %v", got, tt.want)
 			}
 		})
 	}

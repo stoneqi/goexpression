@@ -72,7 +72,7 @@ func goexpressionParserInit() {
 		8, 12, 10, 12, 12, 12, 143, 9, 12, 1, 13, 1, 13, 3, 13, 147, 8, 13, 1,
 		13, 1, 13, 1, 14, 1, 14, 1, 15, 1, 15, 1, 16, 1, 16, 1, 16, 0, 2, 2, 4,
 		17, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 0, 8,
-		2, 0, 5, 5, 33, 38, 2, 0, 28, 32, 37, 38, 2, 0, 27, 27, 34, 36, 1, 0, 21,
+		2, 0, 5, 5, 33, 36, 2, 0, 28, 32, 37, 38, 2, 0, 27, 27, 34, 36, 1, 0, 21,
 		26, 1, 0, 1, 2, 1, 0, 39, 42, 2, 1, 15, 15, 57, 57, 1, 0, 47, 49, 164,
 		0, 34, 1, 0, 0, 0, 2, 40, 1, 0, 0, 0, 4, 71, 1, 0, 0, 0, 6, 93, 1, 0, 0,
 		0, 8, 95, 1, 0, 0, 0, 10, 97, 1, 0, 0, 0, 12, 117, 1, 0, 0, 0, 14, 126,
@@ -315,6 +315,16 @@ func (s *ExpressionStmtContext) ExitRule(listener antlr.ParseTreeListener) {
 	}
 }
 
+func (s *ExpressionStmtContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case goexpressionVisitor:
+		return t.VisitExpressionStmt(s)
+
+	default:
+		return t.VisitChildren(s)
+	}
+}
+
 func (p *goexpressionParser) ExpressionStmt() (localctx IExpressionStmtContext) {
 	this := p
 	_ = this
@@ -510,10 +520,6 @@ func (s *ExpressionContext) STAR() antlr.TerminalNode {
 	return s.GetToken(goexpressionParserSTAR, 0)
 }
 
-func (s *ExpressionContext) AMPERSAND() antlr.TerminalNode {
-	return s.GetToken(goexpressionParserAMPERSAND, 0)
-}
-
 func (s *ExpressionContext) DIV() antlr.TerminalNode {
 	return s.GetToken(goexpressionParserDIV, 0)
 }
@@ -528,6 +534,10 @@ func (s *ExpressionContext) LSHIFT() antlr.TerminalNode {
 
 func (s *ExpressionContext) RSHIFT() antlr.TerminalNode {
 	return s.GetToken(goexpressionParserRSHIFT, 0)
+}
+
+func (s *ExpressionContext) AMPERSAND() antlr.TerminalNode {
+	return s.GetToken(goexpressionParserAMPERSAND, 0)
 }
 
 func (s *ExpressionContext) BIT_CLEAR() antlr.TerminalNode {
@@ -602,6 +612,16 @@ func (s *ExpressionContext) ExitRule(listener antlr.ParseTreeListener) {
 	}
 }
 
+func (s *ExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case goexpressionVisitor:
+		return t.VisitExpression(s)
+
+	default:
+		return t.VisitChildren(s)
+	}
+}
+
 func (p *goexpressionParser) Expression() (localctx IExpressionContext) {
 	return p.expression(0)
 }
@@ -648,7 +668,7 @@ func (p *goexpressionParser) expression(_p int) (localctx IExpressionContext) {
 			p.primaryExpr(0)
 		}
 
-	case goexpressionParserEN_NOT, goexpressionParserEXCLAMATION, goexpressionParserPLUS, goexpressionParserMINUS, goexpressionParserCARET, goexpressionParserSTAR, goexpressionParserAMPERSAND:
+	case goexpressionParserEN_NOT, goexpressionParserEXCLAMATION, goexpressionParserPLUS, goexpressionParserMINUS, goexpressionParserCARET:
 		{
 			p.SetState(38)
 
@@ -658,7 +678,7 @@ func (p *goexpressionParser) expression(_p int) (localctx IExpressionContext) {
 
 			_la = p.GetTokenStream().LA(1)
 
-			if !((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&541165879328) != 0) {
+			if !((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&128849018912) != 0) {
 				var _ri = p.GetErrorHandler().RecoverInline(p)
 
 				localctx.(*ExpressionContext).unary_op = _ri
@@ -1024,6 +1044,16 @@ func (s *PrimaryExprContext) ExitRule(listener antlr.ParseTreeListener) {
 	}
 }
 
+func (s *PrimaryExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case goexpressionVisitor:
+		return t.VisitPrimaryExpr(s)
+
+	default:
+		return t.VisitChildren(s)
+	}
+}
+
 func (p *goexpressionParser) PrimaryExpr() (localctx IPrimaryExprContext) {
 	return p.primaryExpr(0)
 }
@@ -1238,6 +1268,16 @@ func (s *OperandContext) ExitRule(listener antlr.ParseTreeListener) {
 	}
 }
 
+func (s *OperandContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case goexpressionVisitor:
+		return t.VisitOperand(s)
+
+	default:
+		return t.VisitChildren(s)
+	}
+}
+
 func (p *goexpressionParser) Operand() (localctx IOperandContext) {
 	this := p
 	_ = this
@@ -1372,6 +1412,16 @@ func (s *OperandNameContext) EnterRule(listener antlr.ParseTreeListener) {
 func (s *OperandNameContext) ExitRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(goexpressionListener); ok {
 		listenerT.ExitOperandName(s)
+	}
+}
+
+func (s *OperandNameContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case goexpressionVisitor:
+		return t.VisitOperandName(s)
+
+	default:
+		return t.VisitChildren(s)
 	}
 }
 
@@ -1522,6 +1572,16 @@ func (s *Slice_Context) ExitRule(listener antlr.ParseTreeListener) {
 	}
 }
 
+func (s *Slice_Context) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case goexpressionVisitor:
+		return t.VisitSlice_(s)
+
+	default:
+		return t.VisitChildren(s)
+	}
+}
+
 func (p *goexpressionParser) Slice_() (localctx ISlice_Context) {
 	this := p
 	_ = this
@@ -1559,7 +1619,7 @@ func (p *goexpressionParser) Slice_() (localctx ISlice_Context) {
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
 
-		if (int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&1073114759037094) != 0 {
+		if (int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&1072702442176678) != 0 {
 			{
 				p.SetState(98)
 				p.expression(0)
@@ -1574,7 +1634,7 @@ func (p *goexpressionParser) Slice_() (localctx ISlice_Context) {
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
 
-		if (int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&1073114759037094) != 0 {
+		if (int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&1072702442176678) != 0 {
 			{
 				p.SetState(102)
 				p.expression(0)
@@ -1587,7 +1647,7 @@ func (p *goexpressionParser) Slice_() (localctx ISlice_Context) {
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
 
-		if (int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&1073114759037094) != 0 {
+		if (int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&1072702442176678) != 0 {
 			{
 				p.SetState(105)
 				p.expression(0)
@@ -1699,6 +1759,16 @@ func (s *IndexContext) EnterRule(listener antlr.ParseTreeListener) {
 func (s *IndexContext) ExitRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(goexpressionListener); ok {
 		listenerT.ExitIndex(s)
+	}
+}
+
+func (s *IndexContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case goexpressionVisitor:
+		return t.VisitIndex(s)
+
+	default:
+		return t.VisitChildren(s)
 	}
 }
 
@@ -1880,6 +1950,16 @@ func (s *BasicLitContext) ExitRule(listener antlr.ParseTreeListener) {
 	}
 }
 
+func (s *BasicLitContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case goexpressionVisitor:
+		return t.VisitBasicLit(s)
+
+	default:
+		return t.VisitChildren(s)
+	}
+}
+
 func (p *goexpressionParser) BasicLit() (localctx IBasicLitContext) {
 	this := p
 	_ = this
@@ -2011,6 +2091,16 @@ func (s *Nil_litContext) ExitRule(listener antlr.ParseTreeListener) {
 	}
 }
 
+func (s *Nil_litContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case goexpressionVisitor:
+		return t.VisitNil_lit(s)
+
+	default:
+		return t.VisitChildren(s)
+	}
+}
+
 func (p *goexpressionParser) Nil_lit() (localctx INil_litContext) {
 	this := p
 	_ = this
@@ -2106,6 +2196,16 @@ func (s *En_boolContext) EnterRule(listener antlr.ParseTreeListener) {
 func (s *En_boolContext) ExitRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(goexpressionListener); ok {
 		listenerT.ExitEn_bool(s)
+	}
+}
+
+func (s *En_boolContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case goexpressionVisitor:
+		return t.VisitEn_bool(s)
+
+	default:
+		return t.VisitChildren(s)
 	}
 }
 
@@ -2208,6 +2308,16 @@ func (s *Float_litContext) EnterRule(listener antlr.ParseTreeListener) {
 func (s *Float_litContext) ExitRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(goexpressionListener); ok {
 		listenerT.ExitFloat_lit(s)
+	}
+}
+
+func (s *Float_litContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case goexpressionVisitor:
+		return t.VisitFloat_lit(s)
+
+	default:
+		return t.VisitChildren(s)
 	}
 }
 
@@ -2314,6 +2424,16 @@ func (s *IntegerContext) EnterRule(listener antlr.ParseTreeListener) {
 func (s *IntegerContext) ExitRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(goexpressionListener); ok {
 		listenerT.ExitInteger(s)
+	}
+}
+
+func (s *IntegerContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case goexpressionVisitor:
+		return t.VisitInteger(s)
+
+	default:
+		return t.VisitChildren(s)
 	}
 }
 
@@ -2464,6 +2584,16 @@ func (s *ExpressionListContext) ExitRule(listener antlr.ParseTreeListener) {
 	}
 }
 
+func (s *ExpressionListContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case goexpressionVisitor:
+		return t.VisitExpressionList(s)
+
+	default:
+		return t.VisitChildren(s)
+	}
+}
+
 func (p *goexpressionParser) ExpressionList() (localctx IExpressionListContext) {
 	this := p
 	_ = this
@@ -2597,6 +2727,16 @@ func (s *ArgumentsContext) ExitRule(listener antlr.ParseTreeListener) {
 	}
 }
 
+func (s *ArgumentsContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case goexpressionVisitor:
+		return t.VisitArguments(s)
+
+	default:
+		return t.VisitChildren(s)
+	}
+}
+
 func (p *goexpressionParser) Arguments() (localctx IArgumentsContext) {
 	this := p
 	_ = this
@@ -2630,7 +2770,7 @@ func (p *goexpressionParser) Arguments() (localctx IArgumentsContext) {
 	p.GetErrorHandler().Sync(p)
 	_la = p.GetTokenStream().LA(1)
 
-	if (int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&1073114759037094) != 0 {
+	if (int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&1072702442176678) != 0 {
 		{
 			p.SetState(145)
 			p.ExpressionList()
@@ -2712,6 +2852,16 @@ func (s *EosContext) EnterRule(listener antlr.ParseTreeListener) {
 func (s *EosContext) ExitRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(goexpressionListener); ok {
 		listenerT.ExitEos(s)
+	}
+}
+
+func (s *EosContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case goexpressionVisitor:
+		return t.VisitEos(s)
+
+	default:
+		return t.VisitChildren(s)
 	}
 }
 
@@ -2817,6 +2967,16 @@ func (s *IdentifierContext) ExitRule(listener antlr.ParseTreeListener) {
 	}
 }
 
+func (s *IdentifierContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case goexpressionVisitor:
+		return t.VisitIdentifier(s)
+
+	default:
+		return t.VisitChildren(s)
+	}
+}
+
 func (p *goexpressionParser) Identifier() (localctx IIdentifierContext) {
 	this := p
 	_ = this
@@ -2916,6 +3076,16 @@ func (s *String_Context) EnterRule(listener antlr.ParseTreeListener) {
 func (s *String_Context) ExitRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(goexpressionListener); ok {
 		listenerT.ExitString_(s)
+	}
+}
+
+func (s *String_Context) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case goexpressionVisitor:
+		return t.VisitString_(s)
+
+	default:
+		return t.VisitChildren(s)
 	}
 }
 

@@ -1,29 +1,58 @@
 // Package main provides ...
 package parserSecond
 
-type evaluationOperator func(left interface{}, right interface{}, parameters Parameters) (interface{}, error)
-type stageTypeCheck func(value interface{}) bool
-type stageCombinedTypeCheck func(left interface{}, right interface{}) bool
+type EvaluationOperator func(left interface{}, right interface{}, parameters Parameters) (interface{}, error)
+
+func (eo *EvaluationOperator) MarshalJSON() ([]byte, error) {
+	return []byte("\"EvaluationOperator\""), nil
+}
+
+type StageTypeCheck func(value interface{}) bool
+
+func (stc *StageTypeCheck) MarshalJSON() ([]byte, error) {
+	return []byte("\"StageTypeCheck\""), nil
+}
+
+type StageCombinedTypeCheck func(left interface{}, right interface{}) bool
+
+func (sctc *StageCombinedTypeCheck) MarshalJSON() ([]byte, error) {
+	return []byte("\"StageCombinedTypeCheck\""), nil
+}
 
 type evaluationNode struct {
-	symbol OperatorSymbol
+	Symbol OperatorSymbol
 
-	leftOperator, rightOperator *evaluationNode
+	LeftOperator, RightOperator *evaluationNode
 
 	// the operation that will be used to evaluate this stage (such as adding [left] to [right] and return the result)
-	operator evaluationOperator
+	Operator EvaluationOperator
 
 	// ensures that both left and right values are appropriate for this stage. Returns an error if they aren't operable.
-	leftTypeCheck  stageTypeCheck
-	rightTypeCheck stageTypeCheck
+	LeftTypeCheck  StageTypeCheck
+	RightTypeCheck StageTypeCheck
 
-	// if specified, will override whatever is used in "leftTypeCheck" and "rightTypeCheck".
+	// if specified, will override whatever is used in "LeftTypeCheck" and "RightTypeCheck".
 	// primarily used for specific operators that don't care which side a given type is on, but still requires one side to be of a given type
 	// (like string concat)
-	typeCheck stageCombinedTypeCheck
+	TypeCheck StageCombinedTypeCheck
+
+	RawString string
 
 	// regardless of which type check is used, this string format will be used as the error message for type errors
-	typeErrorFormat string
+	TypeErrorFormat string
+}
+
+func newEvaluationNode() *evaluationNode {
+	return &evaluationNode{
+		Symbol:          0,
+		LeftOperator:    nil,
+		RightOperator:   nil,
+		Operator:        nil,
+		LeftTypeCheck:   nil,
+		RightTypeCheck:  nil,
+		TypeCheck:       nil,
+		TypeErrorFormat: "",
+	}
 }
 
 func (eval *evaluationNode) swapWith(other *evaluationNode) {
@@ -35,17 +64,17 @@ func (eval *evaluationNode) swapWith(other *evaluationNode) {
 
 func (eval *evaluationNode) setToNonOperator(other evaluationNode) {
 
-	eval.symbol = other.symbol
-	eval.operator = other.operator
-	eval.leftTypeCheck = other.leftTypeCheck
-	eval.rightTypeCheck = other.rightTypeCheck
-	eval.typeCheck = other.typeCheck
-	eval.typeErrorFormat = other.typeErrorFormat
+	eval.Symbol = other.Symbol
+	eval.Operator = other.Operator
+	eval.LeftTypeCheck = other.LeftTypeCheck
+	eval.RightTypeCheck = other.RightTypeCheck
+	eval.TypeCheck = other.TypeCheck
+	eval.TypeErrorFormat = other.TypeErrorFormat
 }
 
 func (eval *evaluationNode) isShortCircuitable() bool {
 
-	switch eval.symbol {
+	switch eval.Symbol {
 	case LOGICAL_AND:
 		fallthrough
 	case LOGICAL_OR:
