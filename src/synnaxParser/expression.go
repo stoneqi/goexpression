@@ -10,6 +10,8 @@ const shortCircuitHolder int = -1
 type EvaluableExpression struct {
 	stage       *evaluationNode
 	ChecksTypes bool
+	recordStep  []string
+	IsDebug     bool
 }
 
 func (ee *EvaluableExpression) EvalString(expression string, parameters Parameters) (interface{}, error) {
@@ -78,10 +80,14 @@ func (ee *EvaluableExpression) evaluateStage(stage *evaluationNode, parameters P
 		} else {
 			// special case where the type check needs to know both sides to determine if the Operator can handle it
 			if !stage.TypeCheck(left, right) {
-				errorMsg := fmt.Sprintf(stage.TypeErrorFormat, left, stage.Symbol.String())
+				errorMsg := fmt.Sprintf("double check: %+v, value:%v, string:%v", stage.TypeErrorFormat, left, stage.Symbol.String())
 				return nil, errors.New(errorMsg)
 			}
 		}
+	}
+
+	if ee.IsDebug {
+		ee.recordStep = append(ee.recordStep, stage.RawString)
 	}
 
 	return stage.Operator(left, right, parameters)
@@ -97,6 +103,6 @@ func typeCheck(check StageTypeCheck, value interface{}, symbol OperatorSymbol, f
 		return nil
 	}
 
-	errorMsg := fmt.Sprintf(format, value, symbol.String())
+	errorMsg := fmt.Sprintf("single check: %+v, value:%v, string:%v", format, value, symbol.String())
 	return errors.New(errorMsg)
 }

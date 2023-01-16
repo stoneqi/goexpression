@@ -2,6 +2,7 @@ package parserSecond
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -83,6 +84,7 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 	type fields struct {
 		stage       *evaluationNode
 		ChecksTypes bool
+		IsDebug     bool
 	}
 	type args struct {
 		expression string
@@ -189,6 +191,59 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 			want:    bool(123 < 345),
 			wantErr: false,
 		},
+		{
+			name: "a1 * a2 - a2 + a2 * (a1 * a2 - a2 + a2)",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "a1 * a2 - a2 + a2 * (a1 * a2 - a2 + a2)",
+				parameters: MapParameters{
+					"a1": 123,
+					"a2": 345,
+				},
+			},
+			want:    float64(123.0*345.0 - 345.0 + 345.0*(123.0*345.0-345.0+345.0)),
+			wantErr: false,
+		},
+		{
+			name: "a1.a2",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "a1.A2",
+				parameters: MapParameters{
+					"a1": struct {
+						A2 string
+					}{
+						A2: "345",
+					},
+				},
+			},
+			want:    "345",
+			wantErr: false,
+		},
+		{
+			name: "a1[1]",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "a1[1]",
+				parameters: MapParameters{
+					"a1": []interface{}{
+						"345",
+						"456",
+					},
+				},
+			},
+			want:    "456",
+			wantErr: false,
+		},
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
@@ -196,6 +251,7 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 			ee := &EvaluableExpression{
 				stage:       tt.fields.stage,
 				ChecksTypes: tt.fields.ChecksTypes,
+				IsDebug:     true,
 			}
 			got, err := ee.EvalString(tt.args.expression, tt.args.parameters)
 			if (err != nil) != tt.wantErr {
@@ -203,6 +259,7 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
+				t.Log(strings.Join(ee.recordStep, ";"))
 				t.Errorf("EvalString() got = %v, want %v", got, tt.want)
 			}
 		})

@@ -1,5 +1,6 @@
 package parserSecond
 
+//go:generate stringer -type=OperatorSymbol
 type OperatorSymbol uint8
 
 // Node ops.
@@ -35,16 +36,3 @@ const (
 	FUNCPARAMS
 	NIL
 )
-
-func (this OperatorSymbol) String() string {
-
-	switch this {
-	case OR:
-		return "||"
-	case PLUS:
-		return "+"
-	case MINUS:
-		return "-"
-	}
-	return ""
-}

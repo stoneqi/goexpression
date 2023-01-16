@@ -218,6 +218,37 @@ func makeParameterOperator(parameterName string) EvaluationOperator {
 	}
 }
 
+// 左移
+func indexOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+
+	leftValue := reflect.ValueOf(left)
+
+	if leftValue.Kind() == reflect.Map {
+		value := leftValue.MapIndex(reflect.ValueOf(right))
+		if value.IsValid() {
+			return value.Interface(), nil
+		} else {
+			return nil, errors.New("no found in map" + reflect.ValueOf(right).String())
+		}
+	}
+
+	if leftValue.Kind() == reflect.Array || leftValue.Kind() == reflect.Slice {
+		indexFloat, ok := right.(float64)
+		if !ok {
+			return nil, errors.New("index no int in array")
+		}
+		value := leftValue.Index(int(indexFloat))
+		if value.IsValid() {
+			return value.Interface(), nil
+		} else {
+			return nil, errors.New("no found in array" + reflect.ValueOf(right).String())
+		}
+	}
+
+	return nil, errors.New("lefRight is no array or slice or map")
+
+}
+
 // liter值
 func makeLiteralOperator(literal interface{}) EvaluationOperator {
 	return func(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
@@ -226,24 +257,43 @@ func makeLiteralOperator(literal interface{}) EvaluationOperator {
 }
 
 // 函数执行
-func makeFunctionOperator(function ExpressionFunction) EvaluationOperator {
+func makeFunctionOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+	if left == nil {
+		return nil, errors.New("no Function")
+	}
+	if right == nil {
+		return nil, errors.New("no Parameters")
+	}
 
-	return func(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+	fun, ok := left.(ExpressionFunction)
 
-		if right == nil {
-			return function()
-		}
-
-		switch right.(type) {
-		case []interface{}:
-			return function(right.([]interface{})...)
-		default:
-			return function(right)
-		}
+	if !ok {
+		return nil, errors.New("no Parameters")
+	}
+	switch right.(type) {
+	case []interface{}:
+		return fun(right.([]interface{})...)
+	default:
+		return fun(right)
 	}
 }
 
-// 函数执行
+//// 函数执行
+//func makeFuncOperator(function ExpressionFunction) EvaluationOperator {
+//	return func(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+//		res := make([]interface{}, 0, len(expression))
+//		for _, node := range expression {
+//			stage, err := evaluateStage(node, parameters)
+//			if err != nil {
+//				return nil, err
+//			}
+//			res = append(res, stage)
+//		}
+//		return res, nil
+//	}
+//}
+
+// 函数参数
 func makeExpressionListOperator(expression []*evaluationNode) EvaluationOperator {
 	return func(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
 		res := make([]interface{}, 0, len(expression))
@@ -354,6 +404,57 @@ func typeConvertParams(method reflect.Value, params []reflect.Value) ([]reflect.
 	}
 
 	return params, nil
+}
+
+func makeAccessOperator(pair string) EvaluationOperator {
+
+	return func(left interface{}, right interface{}, parameters Parameters) (ret interface{}, err error) {
+
+		value := left
+		// while this library generally tries to handle panic-inducing cases on its own,
+		// accessors are a sticky case which have a lot of possible ways to fail.
+		// therefore every call to an accessor sets up a defer that tries to recover from panics, converting them to errors.
+		defer func() {
+			if r := recover(); r != nil {
+				errorMsg := fmt.Sprintf("Failed to access '%s': %v", pair, r.(string))
+				err = errors.New(errorMsg)
+				ret = nil
+			}
+		}()
+
+		//for i := 1; i < len(pair); i++ {
+
+		coreValue := reflect.ValueOf(value)
+
+		var corePtrVal reflect.Value
+
+		// if this is a pointer, resolve it.
+		if coreValue.Kind() == reflect.Ptr {
+			coreValue = coreValue.Elem()
+		}
+
+		if coreValue.Kind() != reflect.Struct && coreValue.Kind() != reflect.Map {
+			return nil, errors.New("Unable to access '" + pair + "', '" + coreValue.String() + "' is not a struct or map")
+		}
+
+		var res interface{}
+
+		field := coreValue.FieldByName(pair)
+		if field.IsValid() {
+			res = field.Interface()
+		}
+
+		method := coreValue.MethodByName(pair)
+		if method == (reflect.Value{}) {
+			if corePtrVal.IsValid() {
+				method = corePtrVal.MethodByName(pair)
+			}
+			if method.IsValid() {
+				res = method.Interface()
+			}
+		}
+		return res, nil
+	}
 }
 
 // 访问参数 a.b.c
