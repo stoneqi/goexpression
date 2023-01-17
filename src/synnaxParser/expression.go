@@ -91,15 +91,12 @@ func (ee *EvaluableExpression) evaluateStage(stage *evaluationNode, parameters P
 		if err != nil {
 			ee.recordStep = append(ee.recordStep, stage.RawString)
 		} else {
-			ee.recordStep = append(ee.recordStep, fmt.Sprintf("%s_%+v", stage.RawString, value))
+			ee.recordStep = append(ee.recordStep, fmt.Sprintf("%s:%+v", stage.RawString, value))
 		}
 		return value, err
-
 	} else {
 		return stage.Operator(left, right, parameters)
 	}
-
-	return stage.Operator(left, right, parameters)
 }
 
 func typeCheck(check StageTypeCheck, value interface{}, symbol OperatorSymbol, format string) error {

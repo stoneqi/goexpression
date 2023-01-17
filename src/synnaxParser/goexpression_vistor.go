@@ -42,15 +42,11 @@ func (ge *goExpreesionVisitor) VisitExpressionStmt(ctx *parser.ExpressionStmtCon
 
 func (ge *goExpreesionVisitor) VisitExpression(ctx *parser.ExpressionContext) interface{} {
 
+	if ctx.PrimaryExpr() != nil {
+		return ctx.PrimaryExpr().Accept(ge).(*evaluationNode)
+	}
 	node := newEvaluationNode()
 	node.RawString = ctx.GetText()
-	if ctx.GetChildCount() == 1 {
-		node.Symbol = OXXX
-		node.Operator = leftOperator
-
-		leftNode := ctx.GetChildOfType(0, nil)
-		node.LeftOperator = leftNode.Accept(ge).(*evaluationNode)
-	}
 
 	if ctx.GetChildCount() == 2 {
 		if ctx.PLUS() != nil {
