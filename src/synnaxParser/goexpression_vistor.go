@@ -253,15 +253,19 @@ func (ge *goExpreesionVisitor) VisitPrimaryExpr(ctx *parser.PrimaryExprContext) 
 		node.RawString = ctx.GetText()
 		node.LeftOperator = ctx.PrimaryExpr().Accept(ge).(*evaluationNode)
 		if ctx.Index() != nil {
+			node.Symbol = INDEX
 			node.RightOperator = ctx.Index().Accept(ge).(*evaluationNode)
 			node.Operator = indexOperator
 			node.LeftTypeCheck = nil
 		}
 
 		if ctx.Slice_() != nil {
+			node.Symbol = SLICE
 			node.RightOperator = ctx.Slice_().Accept(ge).(*evaluationNode)
+			node.Operator = makeSliceOperator
 		}
 		if ctx.Arguments() != nil {
+			node.Symbol = FUNCCALL
 			node.RightOperator = ctx.Arguments().Accept(ge).(*evaluationNode)
 			node.Operator = makeFunctionOperator
 		}
@@ -301,8 +305,18 @@ func (ge *goExpreesionVisitor) VisitOperandName(ctx *parser.OperandNameContext) 
 }
 
 func (ge *goExpreesionVisitor) VisitSlice_(ctx *parser.Slice_Context) interface{} {
-	//TODO implement me
-	panic("implement me")
+	node := newEvaluationNode()
+	node.RawString = ctx.GetText()
+
+	allExp := ctx.AllExpression()
+	expList := make([]*evaluationNode, 0, len(allExp))
+	for _, context := range allExp {
+		expList = append(expList, context.Accept(ge).(*evaluationNode))
+	}
+
+	node.Symbol = SLICEPARAMS
+	node.Operator = makeExpressionListOperator(expList)
+	return node
 }
 
 func (ge *goExpreesionVisitor) VisitIndex(ctx *parser.IndexContext) interface{} {

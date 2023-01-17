@@ -6,6 +6,7 @@ import (
 	"math"
 	"reflect"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -292,6 +293,31 @@ func makeFunctionOperator(left interface{}, right interface{}, parameters Parame
 //		return res, nil
 //	}
 //}
+
+// 函数参数
+func makeSliceOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+	rightValue, ok := right.([]float64)
+	if !ok {
+		return nil, errors.New("slice index is not array")
+	}
+	leftValue, ok := left.([]interface{})
+	if !ok {
+		return nil, errors.New("slice value is not array")
+	}
+	if len(rightValue) == 2 {
+		if int(rightValue[0]) < 0 || int(rightValue[1]) > len(leftValue) {
+			return nil, errors.New("slice bounds out of range")
+		}
+		return leftValue[int(rightValue[0]):int(rightValue[1])], nil
+	}
+	if len(rightValue) == 3 {
+		if int(rightValue[0]) < 0 || int(rightValue[1]) > len(leftValue) || int(rightValue[2]) > len(leftValue) {
+			return nil, errors.New("slice bounds out of range")
+		}
+		return leftValue[int(rightValue[0]):int(rightValue[1]):int(rightValue[2])], nil
+	}
+	return nil, errors.New("slice params length must 2 or 2, actual:" + strconv.Itoa(len(rightValue)))
+}
 
 // 函数参数
 func makeExpressionListOperator(expression []*evaluationNode) EvaluationOperator {
