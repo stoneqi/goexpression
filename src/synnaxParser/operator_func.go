@@ -296,27 +296,34 @@ func makeFunctionOperator(left interface{}, right interface{}, parameters Parame
 
 // 函数参数
 func makeSliceOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
-	rightValue, ok := right.([]float64)
+	rightValue, ok := right.([]interface{})
 	if !ok {
 		return nil, errors.New("slice index is not array")
 	}
-	leftValue, ok := left.([]interface{})
-	if !ok {
-		return nil, errors.New("slice value is not array")
+	for _, i2 := range rightValue {
+		if _, ok := i2.(float64); !ok {
+			return nil, errors.New("slice index is not num")
+		}
 	}
+	leftIndex := rightValue[0].(float64)
+	rightIndex := rightValue[1].(float64)
+
 	if len(rightValue) == 2 {
-		if int(rightValue[0]) < 0 || int(rightValue[1]) > len(leftValue) {
-			return nil, errors.New("slice bounds out of range")
+		leftValue := reflect.ValueOf(left)
+		if leftValue.Kind() == reflect.Array || leftValue.Kind() == reflect.Slice {
+			if int(leftIndex) < 0 || int(rightIndex) > leftValue.Len() {
+				return nil, errors.New("slice bounds out of range")
+			}
+			value := leftValue.Slice(int(leftIndex), int(rightIndex))
+			if value.IsValid() {
+				return value.Interface(), nil
+			} else {
+				return nil, errors.New("no found in array" + reflect.ValueOf(right).String())
+			}
 		}
-		return leftValue[int(rightValue[0]):int(rightValue[1])], nil
 	}
-	if len(rightValue) == 3 {
-		if int(rightValue[0]) < 0 || int(rightValue[1]) > len(leftValue) || int(rightValue[2]) > len(leftValue) {
-			return nil, errors.New("slice bounds out of range")
-		}
-		return leftValue[int(rightValue[0]):int(rightValue[1]):int(rightValue[2])], nil
-	}
-	return nil, errors.New("slice params length must 2 or 2, actual:" + strconv.Itoa(len(rightValue)))
+
+	return nil, errors.New("slice params length must 2, actual:" + strconv.Itoa(len(rightValue)))
 }
 
 // 函数参数

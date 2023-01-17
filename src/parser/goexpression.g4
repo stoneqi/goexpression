@@ -52,8 +52,7 @@ operand: basicLit | operandName | L_PAREN expression R_PAREN;
 operandName: identifier;
 slice_:
 	L_BRACKET (
-		expression? COLON expression?
-		| expression? COLON expression COLON expression
+		expression COLON expression
 	) R_BRACKET;
 
 index: L_BRACKET expression R_BRACKET;

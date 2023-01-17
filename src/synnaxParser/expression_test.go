@@ -235,13 +235,36 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 			args: args{
 				expression: "a1[1]",
 				parameters: MapParameters{
-					"a1": []interface{}{
+					"a1": []string{
 						"345",
 						"456",
 					},
 				},
 			},
 			want:    "456",
+			wantErr: false,
+		},
+		{
+			name: "a1[1]",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "a1[1:3]",
+				parameters: MapParameters{
+					"a1": []string{
+						"a",
+						"b",
+						"c",
+						"d",
+					},
+				},
+			},
+			want: []string{
+				"b",
+				"c",
+			},
 			wantErr: false,
 		},
 		// TODO: Add test cases.
@@ -255,6 +278,7 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 			}
 			got, err := ee.EvalString(tt.args.expression, tt.args.parameters)
 			if (err != nil) != tt.wantErr {
+				t.Log(strings.Join(ee.recordStep, ";"))
 				t.Errorf("EvalString() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
