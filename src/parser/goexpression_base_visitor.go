@@ -31,6 +31,10 @@ func (v *BasegoexpressionVisitor) VisitSlice_(ctx *Slice_Context) interface{} {
 	return v.VisitChildren(ctx)
 }
 
+func (v *BasegoexpressionVisitor) VisitExpressionColon(ctx *ExpressionColonContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BasegoexpressionVisitor) VisitIndex(ctx *IndexContext) interface{} {
 	return v.VisitChildren(ctx)
 }

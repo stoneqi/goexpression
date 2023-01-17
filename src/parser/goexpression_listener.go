@@ -25,6 +25,9 @@ type goexpressionListener interface {
 	// EnterSlice_ is called when entering the slice_ production.
 	EnterSlice_(c *Slice_Context)
 
+	// EnterExpressionColon is called when entering the expressionColon production.
+	EnterExpressionColon(c *ExpressionColonContext)
+
 	// EnterIndex is called when entering the index production.
 	EnterIndex(c *IndexContext)
 
@@ -75,6 +78,9 @@ type goexpressionListener interface {
 
 	// ExitSlice_ is called when exiting the slice_ production.
 	ExitSlice_(c *Slice_Context)
+
+	// ExitExpressionColon is called when exiting the expressionColon production.
+	ExitExpressionColon(c *ExpressionColonContext)
 
 	// ExitIndex is called when exiting the index production.
 	ExitIndex(c *IndexContext)

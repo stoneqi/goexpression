@@ -267,6 +267,66 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "a?b:c",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "a1[0]?a1[1]:a1[2]",
+				parameters: MapParameters{
+					"a1": []string{
+						"true",
+						"b",
+						"c",
+						"d",
+					},
+				},
+			},
+			want:    "b",
+			wantErr: false,
+		},
+		{
+			name: "a?b:c",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "a1[0]?a1[1]:a1[2]",
+				parameters: MapParameters{
+					"a1": []string{
+						"",
+						"b",
+						"c",
+						"d",
+					},
+				},
+			},
+			want:    "c",
+			wantErr: false,
+		},
+		{
+			name: "a?b:c",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "true?a1[1]:a1[2]",
+				parameters: MapParameters{
+					"a1": []string{
+						"",
+						"b",
+						"c",
+						"d",
+					},
+				},
+			},
+			want:    "b",
+			wantErr: false,
+		},
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
@@ -277,13 +337,12 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 				IsDebug:     true,
 			}
 			got, err := ee.EvalString(tt.args.expression, tt.args.parameters)
+			t.Log(strings.Join(ee.recordStep, "; "))
 			if (err != nil) != tt.wantErr {
-				t.Log(strings.Join(ee.recordStep, ";"))
 				t.Errorf("EvalString() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Log(strings.Join(ee.recordStep, ";"))
 				t.Errorf("EvalString() got = %v, want %v", got, tt.want)
 			}
 		})

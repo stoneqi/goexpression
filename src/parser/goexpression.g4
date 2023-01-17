@@ -34,7 +34,8 @@ expression:
 	| expression LOGICAL_OR expression
     | expression EN_AND expression
     | expression EN_OR expression
-    | expression EN_IN expression;
+    | expression EN_IN expression
+	| expression QUESTION expressionColon;
 
 primaryExpr:
 	operand
@@ -52,8 +53,10 @@ operand: basicLit | operandName | L_PAREN expression R_PAREN;
 operandName: identifier;
 slice_:
 	L_BRACKET (
-		expression COLON expression
-	) R_BRACKET;
+		expressionColon
+	) R_BRACKET; 
+
+expressionColon: expression COLON expression;	
 
 index: L_BRACKET expression R_BRACKET;
 
@@ -115,6 +118,7 @@ R_BRACKET              : ']';
 ASSIGN                 : '=';
 COMMA                  : ',';
 SEMI                   : ';';
+QUESTION               :'?';
 COLON                  : ':';
 DOT                    : '.';
 NIL_LIT                : 'nil';

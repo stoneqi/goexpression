@@ -87,7 +87,16 @@ func (ee *EvaluableExpression) evaluateStage(stage *evaluationNode, parameters P
 	}
 
 	if ee.IsDebug {
-		ee.recordStep = append(ee.recordStep, stage.RawString)
+		value, err := stage.Operator(left, right, parameters)
+		if err != nil {
+			ee.recordStep = append(ee.recordStep, stage.RawString)
+		} else {
+			ee.recordStep = append(ee.recordStep, fmt.Sprintf("%s_%+v", stage.RawString, value))
+		}
+		return value, err
+
+	} else {
+		return stage.Operator(left, right, parameters)
 	}
 
 	return stage.Operator(left, right, parameters)

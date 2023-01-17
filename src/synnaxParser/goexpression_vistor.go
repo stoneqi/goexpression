@@ -238,6 +238,11 @@ func (ge *goExpreesionVisitor) VisitExpression(ctx *parser.ExpressionContext) in
 			node.RightTypeCheck = isBool
 			node.TypeCheck = nil
 		}
+		if ctx.QUESTION() != nil {
+			node.Operator = conditionalOperator
+			//node.LeftTypeCheck = isBool
+			node.TypeErrorFormat = leftNode.GetText() + " value is not boolean "
+		}
 
 	}
 
@@ -305,6 +310,10 @@ func (ge *goExpreesionVisitor) VisitOperandName(ctx *parser.OperandNameContext) 
 }
 
 func (ge *goExpreesionVisitor) VisitSlice_(ctx *parser.Slice_Context) interface{} {
+	return ctx.ExpressionColon().Accept(ge).(*evaluationNode)
+}
+
+func (ge *goExpreesionVisitor) VisitExpressionColon(ctx *parser.ExpressionColonContext) interface{} {
 	node := newEvaluationNode()
 	node.RawString = ctx.GetText()
 
@@ -313,9 +322,8 @@ func (ge *goExpreesionVisitor) VisitSlice_(ctx *parser.Slice_Context) interface{
 	for _, context := range allExp {
 		expList = append(expList, context.Accept(ge).(*evaluationNode))
 	}
-
-	node.Symbol = SLICEPARAMS
-	node.Operator = makeExpressionListOperator(expList)
+	node.Symbol = EXPRESSIONCOLON
+	node.Operator = makeMultiExpressionOperator(expList)
 	return node
 }
 
@@ -398,7 +406,7 @@ func (ge *goExpreesionVisitor) VisitExpressionList(ctx *parser.ExpressionListCon
 	}
 
 	node.Symbol = FUNCPARAMS
-	node.Operator = makeExpressionListOperator(expList)
+	node.Operator = makeMultiExpressionOperator(expList)
 	return node
 }
 

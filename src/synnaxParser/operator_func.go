@@ -257,6 +257,20 @@ func makeLiteralOperator(literal interface{}) EvaluationOperator {
 	}
 }
 
+// 三元运算符
+func conditionalOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+	boolValue := boolJudge(left)
+	conditionalValue, ok := right.([]interface{})
+	if !ok || len(conditionalValue) != 2 {
+		return nil, errors.New("conditional size is not 2")
+	}
+	if boolValue {
+		return conditionalValue[0], nil
+	} else {
+		return conditionalValue[1], nil
+	}
+}
+
 // 函数执行
 func makeFunctionOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
 	if left == nil {
@@ -327,7 +341,7 @@ func makeSliceOperator(left interface{}, right interface{}, parameters Parameter
 }
 
 // 函数参数
-func makeExpressionListOperator(expression []*evaluationNode) EvaluationOperator {
+func makeMultiExpressionOperator(expression []*evaluationNode) EvaluationOperator {
 	return func(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
 		res := make([]interface{}, 0, len(expression))
 		for _, node := range expression {

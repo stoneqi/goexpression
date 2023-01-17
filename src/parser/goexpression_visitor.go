@@ -25,6 +25,9 @@ type goexpressionVisitor interface {
 	// Visit a parse tree produced by goexpressionParser#slice_.
 	VisitSlice_(ctx *Slice_Context) interface{}
 
+	// Visit a parse tree produced by goexpressionParser#expressionColon.
+	VisitExpressionColon(ctx *ExpressionColonContext) interface{}
+
 	// Visit a parse tree produced by goexpressionParser#index.
 	VisitIndex(ctx *IndexContext) interface{}
 

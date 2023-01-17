@@ -56,6 +56,12 @@ func (s *BasegoexpressionListener) EnterSlice_(ctx *Slice_Context) {}
 // ExitSlice_ is called when production slice_ is exited.
 func (s *BasegoexpressionListener) ExitSlice_(ctx *Slice_Context) {}
 
+// EnterExpressionColon is called when production expressionColon is entered.
+func (s *BasegoexpressionListener) EnterExpressionColon(ctx *ExpressionColonContext) {}
+
+// ExitExpressionColon is called when production expressionColon is exited.
+func (s *BasegoexpressionListener) ExitExpressionColon(ctx *ExpressionColonContext) {}
+
 // EnterIndex is called when production index is entered.
 func (s *BasegoexpressionListener) EnterIndex(ctx *IndexContext) {}
 
