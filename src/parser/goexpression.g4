@@ -48,7 +48,7 @@ primaryExpr:
 
 
 
-operand: basicLit | operandName | L_PAREN expression R_PAREN;
+operand: basicLit | operandName | L_PAREN expression R_PAREN |  L_CURLY expressionList R_CURLY;
 
 operandName: identifier;
 slice_:

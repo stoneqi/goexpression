@@ -293,6 +293,9 @@ func (ge *goExpreesionVisitor) VisitOperand(ctx *parser.OperandContext) interfac
 	if ctx.Expression() != nil {
 		return ctx.Expression().Accept(ge).(*evaluationNode)
 	}
+	if ctx.ExpressionList() != nil {
+		return ctx.ExpressionList().Accept(ge).(*evaluationNode)
+	}
 	return nil
 }
 
@@ -401,7 +404,7 @@ func (ge *goExpreesionVisitor) VisitExpressionList(ctx *parser.ExpressionListCon
 		expList = append(expList, context.Accept(ge).(*evaluationNode))
 	}
 
-	node.Symbol = FUNCPARAMS
+	node.Symbol = EXPRESSIONLIST
 	node.Operator = makeMultiExpressionOperator(expList)
 	return node
 }
