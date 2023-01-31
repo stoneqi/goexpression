@@ -74,7 +74,7 @@ func goexpressionParserInit() {
 		16, 1, 17, 1, 17, 1, 17, 0, 2, 2, 4, 18, 0, 2, 4, 6, 8, 10, 12, 14, 16,
 		18, 20, 22, 24, 26, 28, 30, 32, 34, 0, 8, 2, 0, 5, 5, 34, 37, 2, 0, 29,
 		33, 38, 39, 2, 0, 28, 28, 35, 37, 1, 0, 22, 27, 1, 0, 1, 2, 1, 0, 40, 43,
-		2, 1, 15, 15, 58, 58, 1, 0, 48, 50, 158, 0, 36, 1, 0, 0, 0, 2, 42, 1, 0,
+		2, 1, 15, 15, 58, 58, 1, 0, 49, 50, 158, 0, 36, 1, 0, 0, 0, 2, 42, 1, 0,
 		0, 0, 4, 76, 1, 0, 0, 0, 6, 102, 1, 0, 0, 0, 8, 104, 1, 0, 0, 0, 10, 106,
 		1, 0, 0, 0, 12, 110, 1, 0, 0, 0, 14, 114, 1, 0, 0, 0, 16, 123, 1, 0, 0,
 		0, 18, 125, 1, 0, 0, 0, 20, 127, 1, 0, 0, 0, 22, 129, 1, 0, 0, 0, 24, 131,
@@ -683,7 +683,7 @@ func (p *goexpressionParser) expression(_p int) (localctx IExpressionContext) {
 	p.GetErrorHandler().Sync(p)
 
 	switch p.GetTokenStream().LA(1) {
-	case goexpressionParserEN_TRUE, goexpressionParserEN_FALSE, goexpressionParserL_PAREN, goexpressionParserL_CURLY, goexpressionParserNIL_LIT, goexpressionParserDECIMAL_LIT, goexpressionParserBINARY_LIT, goexpressionParserOCTAL_LIT, goexpressionParserHEX_LIT, goexpressionParserFLOAT_LIT, goexpressionParserIDENTIFIER, goexpressionParserRAW_STRING_LIT, goexpressionParserINTERPRETED_STRING_LIT, goexpressionParserSINGLE_STRING_LIT:
+	case goexpressionParserEN_TRUE, goexpressionParserEN_FALSE, goexpressionParserL_PAREN, goexpressionParserL_CURLY, goexpressionParserNIL_LIT, goexpressionParserDECIMAL_LIT, goexpressionParserBINARY_LIT, goexpressionParserOCTAL_LIT, goexpressionParserHEX_LIT, goexpressionParserFLOAT_LIT, goexpressionParserIDENTIFIER, goexpressionParserINTERPRETED_STRING_LIT, goexpressionParserSINGLE_STRING_LIT:
 		{
 			p.SetState(39)
 			p.primaryExpr(0)
@@ -1367,7 +1367,7 @@ func (p *goexpressionParser) Operand() (localctx IOperandContext) {
 	p.GetErrorHandler().Sync(p)
 
 	switch p.GetTokenStream().LA(1) {
-	case goexpressionParserEN_TRUE, goexpressionParserEN_FALSE, goexpressionParserNIL_LIT, goexpressionParserDECIMAL_LIT, goexpressionParserBINARY_LIT, goexpressionParserOCTAL_LIT, goexpressionParserHEX_LIT, goexpressionParserFLOAT_LIT, goexpressionParserRAW_STRING_LIT, goexpressionParserINTERPRETED_STRING_LIT, goexpressionParserSINGLE_STRING_LIT:
+	case goexpressionParserEN_TRUE, goexpressionParserEN_FALSE, goexpressionParserNIL_LIT, goexpressionParserDECIMAL_LIT, goexpressionParserBINARY_LIT, goexpressionParserOCTAL_LIT, goexpressionParserHEX_LIT, goexpressionParserFLOAT_LIT, goexpressionParserINTERPRETED_STRING_LIT, goexpressionParserSINGLE_STRING_LIT:
 		p.EnterOuterAlt(localctx, 1)
 		{
 			p.SetState(92)
@@ -2149,7 +2149,7 @@ func (p *goexpressionParser) BasicLit() (localctx IBasicLitContext) {
 			p.Integer()
 		}
 
-	case goexpressionParserRAW_STRING_LIT, goexpressionParserINTERPRETED_STRING_LIT, goexpressionParserSINGLE_STRING_LIT:
+	case goexpressionParserINTERPRETED_STRING_LIT, goexpressionParserSINGLE_STRING_LIT:
 		p.EnterOuterAlt(localctx, 4)
 		{
 			p.SetState(121)
@@ -2911,7 +2911,7 @@ func (p *goexpressionParser) Arguments() (localctx IArgumentsContext) {
 	p.GetErrorHandler().Sync(p)
 	_la = p.GetTokenStream().LA(1)
 
-	if (int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&2145404884353702) != 0 {
+	if (int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&1863929907643046) != 0 {
 		{
 			p.SetState(142)
 			p.ExpressionList()
@@ -3188,10 +3188,6 @@ func NewString_Context(parser antlr.Parser, parent antlr.ParserRuleContext, invo
 
 func (s *String_Context) GetParser() antlr.Parser { return s.parser }
 
-func (s *String_Context) RAW_STRING_LIT() antlr.TerminalNode {
-	return s.GetToken(goexpressionParserRAW_STRING_LIT, 0)
-}
-
 func (s *String_Context) INTERPRETED_STRING_LIT() antlr.TerminalNode {
 	return s.GetToken(goexpressionParserINTERPRETED_STRING_LIT, 0)
 }
@@ -3259,7 +3255,7 @@ func (p *goexpressionParser) String_() (localctx IString_Context) {
 		p.SetState(151)
 		_la = p.GetTokenStream().LA(1)
 
-		if !((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&1970324836974592) != 0) {
+		if !(_la == goexpressionParserINTERPRETED_STRING_LIT || _la == goexpressionParserSINGLE_STRING_LIT) {
 			p.GetErrorHandler().RecoverInline(p)
 		} else {
 			p.GetErrorHandler().ReportMatch(p)

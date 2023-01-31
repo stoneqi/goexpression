@@ -1,3 +1,3 @@
 package parserSecond
 
-type ExpressionFunction func(arguments ...interface{}) (interface{}, error)
+type ExpressionFunction func(arguments ...any) (any, error)

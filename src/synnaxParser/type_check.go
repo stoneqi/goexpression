@@ -3,7 +3,7 @@ package parserSecond
 import "regexp"
 
 // 是字符串
-func isString(value interface{}) bool {
+func isString(value any) bool {
 
 	switch value.(type) {
 	case string:
@@ -13,7 +13,7 @@ func isString(value interface{}) bool {
 }
 
 // regex or string
-func isRegexOrString(value interface{}) bool {
+func isRegexOrString(value any) bool {
 
 	switch value.(type) {
 	case string:
@@ -25,7 +25,7 @@ func isRegexOrString(value interface{}) bool {
 }
 
 // 布尔
-func isBool(value interface{}) bool {
+func isBool(value any) bool {
 	switch value.(type) {
 	case bool:
 		return true
@@ -34,7 +34,7 @@ func isBool(value interface{}) bool {
 }
 
 // 字符
-func isFloat64(value interface{}) bool {
+func isFloat64(value any) bool {
 	switch value.(type) {
 	case float64:
 		return true
@@ -43,7 +43,7 @@ func isFloat64(value interface{}) bool {
 }
 
 // 加法，支持字符串和数字
-func additionTypeCheck(left interface{}, right interface{}) bool {
+func additionTypeCheck(left any, right any) bool {
 
 	if isFloat64(left) && isFloat64(right) {
 		return true
@@ -55,7 +55,7 @@ func additionTypeCheck(left interface{}, right interface{}) bool {
 }
 
 // 比较操作类型检测
-func comparatorTypeCheck(left interface{}, right interface{}) bool {
+func comparatorTypeCheck(left any, right any) bool {
 
 	if isFloat64(left) && isFloat64(right) {
 		return true
@@ -67,9 +67,9 @@ func comparatorTypeCheck(left interface{}, right interface{}) bool {
 }
 
 // 数组
-func isArray(value interface{}) bool {
+func isArray(value any) bool {
 	switch value.(type) {
-	case []interface{}:
+	case []any:
 		return true
 	}
 	return false

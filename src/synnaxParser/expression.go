@@ -14,14 +14,14 @@ type EvaluableExpression struct {
 	IsDebug     bool
 }
 
-func (ee *EvaluableExpression) EvalString(expression string, parameters Parameters) (interface{}, error) {
+func (ee *EvaluableExpression) EvalString(expression string, parameters Parameters) (any, error) {
 	ee.stage, _ = VisitorParserString(expression)
 	return ee.evaluateStage(ee.stage, parameters)
 }
 
-func (ee *EvaluableExpression) evaluateStage(stage *evaluationNode, parameters Parameters) (interface{}, error) {
+func (ee *EvaluableExpression) evaluateStage(stage *evaluationNode, parameters Parameters) (any, error) {
 
-	var left, right interface{}
+	var left, right any
 	var err error
 
 	if stage.LeftOperator != nil {
@@ -99,7 +99,7 @@ func (ee *EvaluableExpression) evaluateStage(stage *evaluationNode, parameters P
 	}
 }
 
-func typeCheck(check StageTypeCheck, value interface{}, symbol OperatorSymbol, format string) error {
+func typeCheck(check StageTypeCheck, value any, symbol OperatorSymbol, format string) error {
 
 	if check == nil {
 		return nil

@@ -11,28 +11,28 @@ import (
 )
 
 var (
-	_true  = interface{}(true)
-	_false = interface{}(false)
+	_true  = any(true)
+	_false = any(false)
 )
 
 // left
-func leftOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+func leftOperator(left any, right any, parameters Parameters) (any, error) {
 	return left, nil
 }
 
 // right
-func rightOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+func rightOperator(left any, right any, parameters Parameters) (any, error) {
 	return right, nil
 }
 
 // 加法： +2=2
-func unAryAddOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+func unAryAddOperator(left any, right any, parameters Parameters) (any, error) {
 
 	return right.(float64), nil
 }
 
 // 加法： "a"+"b" = "ab"; 1+2=3
-func addOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+func addOperator(left any, right any, parameters Parameters) (any, error) {
 
 	// string concat if either are strings
 	if isString(left) || isString(right) {
@@ -43,32 +43,32 @@ func addOperator(left interface{}, right interface{}, parameters Parameters) (in
 }
 
 // 减法： 1 - 3 = -2
-func subtractOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+func subtractOperator(left any, right any, parameters Parameters) (any, error) {
 	return left.(float64) - right.(float64), nil
 }
 
 // 乘法：
-func multiplyOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+func multiplyOperator(left any, right any, parameters Parameters) (any, error) {
 	return left.(float64) * right.(float64), nil
 }
 
 // 除法
-func divideOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+func divideOperator(left any, right any, parameters Parameters) (any, error) {
 	return left.(float64) / right.(float64), nil
 }
 
 // 平方
-func exponentOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+func exponentOperator(left any, right any, parameters Parameters) (any, error) {
 	return math.Pow(left.(float64), right.(float64)), nil
 }
 
 // 取模
-func modulusOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+func modulusOperator(left any, right any, parameters Parameters) (any, error) {
 	return math.Mod(left.(float64), right.(float64)), nil
 }
 
 // 大于等于
-func gteOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+func gteOperator(left any, right any, parameters Parameters) (any, error) {
 	if isString(left) && isString(right) {
 		return boolIface(left.(string) >= right.(string)), nil
 	}
@@ -76,7 +76,7 @@ func gteOperator(left interface{}, right interface{}, parameters Parameters) (in
 }
 
 // 大于
-func gtOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+func gtOperator(left any, right any, parameters Parameters) (any, error) {
 	if isString(left) && isString(right) {
 		return boolIface(left.(string) > right.(string)), nil
 	}
@@ -84,7 +84,7 @@ func gtOperator(left interface{}, right interface{}, parameters Parameters) (int
 }
 
 // 小于等于
-func lteOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+func lteOperator(left any, right any, parameters Parameters) (any, error) {
 	if isString(left) && isString(right) {
 		return boolIface(left.(string) <= right.(string)), nil
 	}
@@ -92,7 +92,7 @@ func lteOperator(left interface{}, right interface{}, parameters Parameters) (in
 }
 
 // 小于
-func ltOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+func ltOperator(left any, right any, parameters Parameters) (any, error) {
 	if isString(left) && isString(right) {
 		return boolIface(left.(string) < right.(string)), nil
 	}
@@ -100,37 +100,37 @@ func ltOperator(left interface{}, right interface{}, parameters Parameters) (int
 }
 
 // 等于
-func equalOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+func equalOperator(left any, right any, parameters Parameters) (any, error) {
 	return boolIface(reflect.DeepEqual(left, right)), nil
 }
 
 // 不等于
-func notEqualOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+func notEqualOperator(left any, right any, parameters Parameters) (any, error) {
 	return boolIface(!reflect.DeepEqual(left, right)), nil
 }
 
 // and
-func andOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+func andOperator(left any, right any, parameters Parameters) (any, error) {
 	return boolIface(left.(bool) && right.(bool)), nil
 }
 
 // or
-func orOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+func orOperator(left any, right any, parameters Parameters) (any, error) {
 	return boolIface(left.(bool) || right.(bool)), nil
 }
 
 // 取负数
-func negateOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+func negateOperator(left any, right any, parameters Parameters) (any, error) {
 	return -right.(float64), nil
 }
 
 // 取反
-func invertOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+func invertOperator(left any, right any, parameters Parameters) (any, error) {
 	return boolIface(!right.(bool)), nil
 }
 
 // 按位取反
-func bitwiseNotOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+func bitwiseNotOperator(left any, right any, parameters Parameters) (any, error) {
 	return float64(^int64(right.(float64))), nil
 }
 
@@ -148,7 +148,7 @@ func bitwiseNotOperator(left interface{}, right interface{}, parameters Paramete
 //}
 
 // 布尔
-func regexOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+func regexOperator(left any, right any, parameters Parameters) (any, error) {
 
 	var pattern *regexp.Regexp
 	var err error
@@ -166,7 +166,7 @@ func regexOperator(left interface{}, right interface{}, parameters Parameters) (
 	return pattern.Match([]byte(left.(string))), nil
 }
 
-func notRegexOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+func notRegexOperator(left any, right any, parameters Parameters) (any, error) {
 
 	ret, err := regexOperator(left, right, parameters)
 	if err != nil {
@@ -177,39 +177,39 @@ func notRegexOperator(left interface{}, right interface{}, parameters Parameters
 }
 
 // 二元按位或
-func bitwiseOrOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+func bitwiseOrOperator(left any, right any, parameters Parameters) (any, error) {
 	return float64(int64(left.(float64)) | int64(right.(float64))), nil
 }
 
 // 二元按位且
-func bitwiseAndOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+func bitwiseAndOperator(left any, right any, parameters Parameters) (any, error) {
 	return float64(int64(left.(float64)) & int64(right.(float64))), nil
 }
 
 // 二元按位异或
-func bitwiseXOROperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+func bitwiseXOROperator(left any, right any, parameters Parameters) (any, error) {
 	return float64(int64(left.(float64)) ^ int64(right.(float64))), nil
 }
 
 // 位清零
-func bitwiseAndNotOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+func bitwiseAndNotOperator(left any, right any, parameters Parameters) (any, error) {
 	return float64(int64(left.(float64)) &^ int64(right.(float64))), nil
 }
 
 // 左移
-func leftShiftOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+func leftShiftOperator(left any, right any, parameters Parameters) (any, error) {
 	return float64(uint64(left.(float64)) << uint64(right.(float64))), nil
 }
 
 // 左移
-func rightShiftOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+func rightShiftOperator(left any, right any, parameters Parameters) (any, error) {
 	return float64(uint64(left.(float64)) >> uint64(right.(float64))), nil
 }
 
 // 获取参数值
 func makeParameterOperator(parameterName string) EvaluationOperator {
 
-	return func(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+	return func(left any, right any, parameters Parameters) (any, error) {
 		value, err := parameters.Get(parameterName)
 		if err != nil {
 			return nil, err
@@ -220,7 +220,7 @@ func makeParameterOperator(parameterName string) EvaluationOperator {
 }
 
 // 左移
-func indexOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+func indexOperator(left any, right any, parameters Parameters) (any, error) {
 
 	leftValue := reflect.ValueOf(left)
 
@@ -251,16 +251,16 @@ func indexOperator(left interface{}, right interface{}, parameters Parameters) (
 }
 
 // liter值
-func makeLiteralOperator(literal interface{}) EvaluationOperator {
-	return func(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+func makeLiteralOperator(literal any) EvaluationOperator {
+	return func(left any, right any, parameters Parameters) (any, error) {
 		return literal, nil
 	}
 }
 
 // 三元运算符
-func conditionalOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+func conditionalOperator(left any, right any, parameters Parameters) (any, error) {
 	boolValue := boolJudge(left)
-	conditionalValue, ok := right.([]interface{})
+	conditionalValue, ok := right.([]any)
 	if !ok || len(conditionalValue) != 2 {
 		return nil, errors.New("conditional size is not 2")
 	}
@@ -272,7 +272,7 @@ func conditionalOperator(left interface{}, right interface{}, parameters Paramet
 }
 
 // 函数执行
-func makeFunctionOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+func makeFunctionOperator(left any, right any, parameters Parameters) (any, error) {
 	if left == nil {
 		return nil, errors.New("no Function")
 	}
@@ -286,8 +286,8 @@ func makeFunctionOperator(left interface{}, right interface{}, parameters Parame
 		return nil, errors.New("no Parameters")
 	}
 	switch right.(type) {
-	case []interface{}:
-		return fun(right.([]interface{})...)
+	case []any:
+		return fun(right.([]any)...)
 	default:
 		return fun(right)
 	}
@@ -309,8 +309,8 @@ func makeFunctionOperator(left interface{}, right interface{}, parameters Parame
 //}
 
 // 函数参数
-func makeSliceOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
-	rightValue, ok := right.([]interface{})
+func makeSliceOperator(left any, right any, parameters Parameters) (any, error) {
+	rightValue, ok := right.([]any)
 	if !ok {
 		return nil, errors.New("slice index is not array")
 	}
@@ -342,8 +342,8 @@ func makeSliceOperator(left interface{}, right interface{}, parameters Parameter
 
 // 函数参数
 func makeMultiExpressionOperator(expression []*evaluationNode) EvaluationOperator {
-	return func(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
-		res := make([]interface{}, 0, len(expression))
+	return func(left any, right any, parameters Parameters) (any, error) {
+		res := make([]any, 0, len(expression))
 		for _, node := range expression {
 			stage, err := evaluateStage(node, parameters)
 			if err != nil {
@@ -355,9 +355,9 @@ func makeMultiExpressionOperator(expression []*evaluationNode) EvaluationOperato
 	}
 }
 
-func evaluateStage(stage *evaluationNode, parameters Parameters) (interface{}, error) {
+func evaluateStage(stage *evaluationNode, parameters Parameters) (any, error) {
 
-	var left, right interface{}
+	var left, right any
 	var err error
 
 	if stage.LeftOperator != nil {
@@ -455,7 +455,7 @@ func typeConvertParams(method reflect.Value, params []reflect.Value) ([]reflect.
 
 func makeAccessOperator(pair string) EvaluationOperator {
 
-	return func(left interface{}, right interface{}, parameters Parameters) (ret interface{}, err error) {
+	return func(left any, right any, parameters Parameters) (ret any, err error) {
 
 		value := left
 		// while this library generally tries to handle panic-inducing cases on its own,
@@ -484,7 +484,7 @@ func makeAccessOperator(pair string) EvaluationOperator {
 			return nil, errors.New("Unable to access '" + pair + "', '" + coreValue.String() + "' is not a struct or map")
 		}
 
-		var res interface{}
+		var res any
 
 		field := coreValue.FieldByName(pair)
 		if field.IsValid() {
@@ -509,7 +509,7 @@ func makeAccessorOperator(pair []string) EvaluationOperator {
 
 	reconstructed := strings.Join(pair, ".")
 
-	return func(left interface{}, right interface{}, parameters Parameters) (ret interface{}, err error) {
+	return func(left any, right any, parameters Parameters) (ret any, err error) {
 
 		var params []reflect.Value
 
@@ -562,9 +562,9 @@ func makeAccessorOperator(pair []string) EvaluationOperator {
 			}
 
 			switch right.(type) {
-			case []interface{}:
+			case []any:
 
-				givenParams := right.([]interface{})
+				givenParams := right.([]any)
 				params = make([]reflect.Value, len(givenParams))
 				for idx, _ := range givenParams {
 					params[idx] = reflect.ValueOf(givenParams[idx])
@@ -577,7 +577,7 @@ func makeAccessorOperator(pair []string) EvaluationOperator {
 					break
 				}
 
-				params = []reflect.Value{reflect.ValueOf(right.(interface{}))}
+				params = []reflect.Value{reflect.ValueOf(right.(any))}
 			}
 
 			params, err = typeConvertParams(method, params)
@@ -635,9 +635,9 @@ func makeAccessorOperator(pair []string) EvaluationOperator {
 //}
 
 // in 函数
-func inOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
+func inOperator(left any, right any, parameters Parameters) (any, error) {
 
-	for _, value := range right.([]interface{}) {
+	for _, value := range right.([]any) {
 		if left == value {
 			return true, nil
 		}
@@ -649,7 +649,7 @@ func inOperator(left interface{}, right interface{}, parameters Parameters) (int
 Converting a boolean to an interface{} requires an allocation.
 We can use interned bools to avoid this cost.
 */
-func boolIface(b bool) interface{} {
+func boolIface(b bool) any {
 	if b {
 		return _true
 	}

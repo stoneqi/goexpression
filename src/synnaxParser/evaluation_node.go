@@ -1,19 +1,19 @@
 // Package main provides ...
 package parserSecond
 
-type EvaluationOperator func(left interface{}, right interface{}, parameters Parameters) (interface{}, error)
+type EvaluationOperator func(left any, right any, parameters Parameters) (any, error)
 
 func (eo *EvaluationOperator) MarshalJSON() ([]byte, error) {
 	return []byte("\"EvaluationOperator\""), nil
 }
 
-type StageTypeCheck func(value interface{}) bool
+type StageTypeCheck func(value any) bool
 
 func (stc *StageTypeCheck) MarshalJSON() ([]byte, error) {
 	return []byte("\"StageTypeCheck\""), nil
 }
 
-type StageCombinedTypeCheck func(left interface{}, right interface{}) bool
+type StageCombinedTypeCheck func(left any, right any) bool
 
 func (sctc *StageCombinedTypeCheck) MarshalJSON() ([]byte, error) {
 	return []byte("\"StageCombinedTypeCheck\""), nil

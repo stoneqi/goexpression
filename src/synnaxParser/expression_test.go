@@ -18,7 +18,7 @@ func TestEvaluableExpression_evaluateStage(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    interface{}
+		want    any
 		wantErr bool
 	}{
 		{
@@ -94,7 +94,7 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    interface{}
+		want    any
 		wantErr bool
 	}{
 		{
@@ -327,6 +327,91 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 			want:    "b",
 			wantErr: false,
 		},
+		{
+			name: "{0,1,2}",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "{0,1,2}",
+				parameters: MapParameters{
+					"a1": []string{
+						"",
+						"b",
+						"c",
+						"d",
+					},
+				},
+			},
+			want:    []any{0.0, 1.0, 2.0},
+			wantErr: false,
+		},
+		{
+			name: "{0,1,2}[1]",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "{0,1,2}[1]",
+				parameters: MapParameters{
+					"a1": []string{
+						"",
+						"b",
+						"c",
+						"d",
+					},
+				},
+			},
+			want:    1.0,
+			wantErr: false,
+		},
+		{
+			name: "{\"1\",\"2\",\"3\"}[1]",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "{\"1\",\"2\",\"3\"}[1]",
+				parameters: MapParameters{
+					"a1": 4,
+				},
+			},
+			want:    "2",
+			wantErr: false,
+		},
+		{
+			name: "{\"1\",2,\"3\"}[1]",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "{\"1\",2,\"3\"}[1]",
+				parameters: MapParameters{
+					"a1": 4,
+				},
+			},
+			want:    2.0,
+			wantErr: false,
+		},
+		{
+			name: "{0,1,2}[1] > a1",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "{0,1,2}[1] > a1",
+				parameters: MapParameters{
+					"a1": 4,
+				},
+			},
+			want:    false,
+			wantErr: false,
+		},
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
@@ -337,13 +422,13 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 				IsDebug:     true,
 			}
 			got, err := ee.EvalString(tt.args.expression, tt.args.parameters)
-			t.Log(strings.Join(ee.recordStep, "; "))
+			t.Logf("%s; got:%+v; type:%+v", strings.Join(ee.recordStep, "; "), got, reflect.TypeOf(got))
 			if (err != nil) != tt.wantErr {
 				t.Errorf("EvalString() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("EvalString() got = %v, want %v", got, tt.want)
+				t.Errorf("EvalString() got = %+v, want %+v", got, tt.want)
 			}
 		})
 	}

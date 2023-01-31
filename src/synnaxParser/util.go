@@ -4,7 +4,7 @@ import (
 	"reflect"
 )
 
-func castToFloat64(value interface{}) interface{} {
+func castToFloat64(value any) any {
 	switch value.(type) {
 	case uint8:
 		return float64(value.(uint8))
@@ -46,6 +46,6 @@ func castToFloat64(value interface{}) interface{} {
 //	}
 //}
 
-func boolJudge(value interface{}) bool {
+func boolJudge(value any) bool {
 	return !reflect.ValueOf(value).IsZero()
 }

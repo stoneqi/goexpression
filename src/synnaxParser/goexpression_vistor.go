@@ -16,31 +16,31 @@ func newGoExpreesionVisitor() *goExpreesionVisitor {
 	return &goExpreesionVisitor{}
 }
 
-func (ge *goExpreesionVisitor) Visit(tree antlr.ParseTree) interface{} {
+func (ge *goExpreesionVisitor) Visit(tree antlr.ParseTree) any {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (ge *goExpreesionVisitor) VisitChildren(node antlr.RuleNode) interface{} {
+func (ge *goExpreesionVisitor) VisitChildren(node antlr.RuleNode) any {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (ge *goExpreesionVisitor) VisitTerminal(node antlr.TerminalNode) interface{} {
+func (ge *goExpreesionVisitor) VisitTerminal(node antlr.TerminalNode) any {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (ge *goExpreesionVisitor) VisitErrorNode(node antlr.ErrorNode) interface{} {
+func (ge *goExpreesionVisitor) VisitErrorNode(node antlr.ErrorNode) any {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (ge *goExpreesionVisitor) VisitExpressionStmt(ctx *parser.ExpressionStmtContext) interface{} {
+func (ge *goExpreesionVisitor) VisitExpressionStmt(ctx *parser.ExpressionStmtContext) any {
 	return ctx.Expression().Accept(ge)
 }
 
-func (ge *goExpreesionVisitor) VisitExpression(ctx *parser.ExpressionContext) interface{} {
+func (ge *goExpreesionVisitor) VisitExpression(ctx *parser.ExpressionContext) any {
 
 	if ctx.PrimaryExpr() != nil {
 		return ctx.PrimaryExpr().Accept(ge).(*evaluationNode)
@@ -245,7 +245,7 @@ func (ge *goExpreesionVisitor) VisitExpression(ctx *parser.ExpressionContext) in
 	return node
 }
 
-func (ge *goExpreesionVisitor) VisitPrimaryExpr(ctx *parser.PrimaryExprContext) interface{} {
+func (ge *goExpreesionVisitor) VisitPrimaryExpr(ctx *parser.PrimaryExprContext) any {
 	if ctx.GetChildCount() == 1 {
 		return ctx.GetChildOfType(0, nil).Accept(ge).(*evaluationNode)
 	}
@@ -283,7 +283,7 @@ func (ge *goExpreesionVisitor) VisitPrimaryExpr(ctx *parser.PrimaryExprContext) 
 	return nil
 }
 
-func (ge *goExpreesionVisitor) VisitOperand(ctx *parser.OperandContext) interface{} {
+func (ge *goExpreesionVisitor) VisitOperand(ctx *parser.OperandContext) any {
 	if ctx.BasicLit() != nil {
 		return ctx.BasicLit().Accept(ge).(*evaluationNode)
 	}
@@ -299,7 +299,7 @@ func (ge *goExpreesionVisitor) VisitOperand(ctx *parser.OperandContext) interfac
 	return nil
 }
 
-func (ge *goExpreesionVisitor) VisitOperandName(ctx *parser.OperandNameContext) interface{} {
+func (ge *goExpreesionVisitor) VisitOperandName(ctx *parser.OperandNameContext) any {
 	node := newEvaluationNode()
 	node.RawString = ctx.GetText()
 	node.Symbol = LITERAL
@@ -308,11 +308,11 @@ func (ge *goExpreesionVisitor) VisitOperandName(ctx *parser.OperandNameContext) 
 	return node
 }
 
-func (ge *goExpreesionVisitor) VisitSlice_(ctx *parser.Slice_Context) interface{} {
+func (ge *goExpreesionVisitor) VisitSlice_(ctx *parser.Slice_Context) any {
 	return ctx.ExpressionColon().Accept(ge).(*evaluationNode)
 }
 
-func (ge *goExpreesionVisitor) VisitExpressionColon(ctx *parser.ExpressionColonContext) interface{} {
+func (ge *goExpreesionVisitor) VisitExpressionColon(ctx *parser.ExpressionColonContext) any {
 	node := newEvaluationNode()
 	node.RawString = ctx.GetText()
 
@@ -326,16 +326,16 @@ func (ge *goExpreesionVisitor) VisitExpressionColon(ctx *parser.ExpressionColonC
 	return node
 }
 
-func (ge *goExpreesionVisitor) VisitIndex(ctx *parser.IndexContext) interface{} {
+func (ge *goExpreesionVisitor) VisitIndex(ctx *parser.IndexContext) any {
 	return ctx.Expression().Accept(ge).(*evaluationNode)
 }
 
-func (ge *goExpreesionVisitor) VisitBasicLit(ctx *parser.BasicLitContext) interface{} {
+func (ge *goExpreesionVisitor) VisitBasicLit(ctx *parser.BasicLitContext) any {
 	leftNode := ctx.GetChildOfType(0, nil)
 	return leftNode.Accept(ge).(*evaluationNode)
 }
 
-func (ge *goExpreesionVisitor) VisitNil_lit(ctx *parser.Nil_litContext) interface{} {
+func (ge *goExpreesionVisitor) VisitNil_lit(ctx *parser.Nil_litContext) any {
 	node := newEvaluationNode()
 	node.RawString = ctx.GetText()
 	node.Symbol = NIL
@@ -343,7 +343,7 @@ func (ge *goExpreesionVisitor) VisitNil_lit(ctx *parser.Nil_litContext) interfac
 	return node
 }
 
-func (ge *goExpreesionVisitor) VisitEn_bool(ctx *parser.En_boolContext) interface{} {
+func (ge *goExpreesionVisitor) VisitEn_bool(ctx *parser.En_boolContext) any {
 	node := newEvaluationNode()
 	node.RawString = ctx.GetText()
 	node.Symbol = BOOL
@@ -356,7 +356,7 @@ func (ge *goExpreesionVisitor) VisitEn_bool(ctx *parser.En_boolContext) interfac
 	return node
 }
 
-func (ge *goExpreesionVisitor) VisitFloat_lit(ctx *parser.Float_litContext) interface{} {
+func (ge *goExpreesionVisitor) VisitFloat_lit(ctx *parser.Float_litContext) any {
 	node := newEvaluationNode()
 	node.RawString = ctx.GetText()
 	node.Symbol = FLOATE64
@@ -368,7 +368,7 @@ func (ge *goExpreesionVisitor) VisitFloat_lit(ctx *parser.Float_litContext) inte
 	return node
 }
 
-func (ge *goExpreesionVisitor) VisitInteger(ctx *parser.IntegerContext) interface{} {
+func (ge *goExpreesionVisitor) VisitInteger(ctx *parser.IntegerContext) any {
 	node := newEvaluationNode()
 	node.RawString = ctx.GetText()
 	node.Symbol = FLOATE64
@@ -394,7 +394,7 @@ func (ge *goExpreesionVisitor) VisitInteger(ctx *parser.IntegerContext) interfac
 	return node
 }
 
-func (ge *goExpreesionVisitor) VisitExpressionList(ctx *parser.ExpressionListContext) interface{} {
+func (ge *goExpreesionVisitor) VisitExpressionList(ctx *parser.ExpressionListContext) any {
 	node := newEvaluationNode()
 	node.RawString = ctx.GetText()
 
@@ -409,16 +409,16 @@ func (ge *goExpreesionVisitor) VisitExpressionList(ctx *parser.ExpressionListCon
 	return node
 }
 
-func (ge *goExpreesionVisitor) VisitArguments(ctx *parser.ArgumentsContext) interface{} {
+func (ge *goExpreesionVisitor) VisitArguments(ctx *parser.ArgumentsContext) any {
 	return ctx.ExpressionList().Accept(ge).(*evaluationNode)
 }
 
-func (ge *goExpreesionVisitor) VisitEos(ctx *parser.EosContext) interface{} {
+func (ge *goExpreesionVisitor) VisitEos(ctx *parser.EosContext) any {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (ge *goExpreesionVisitor) VisitIdentifier(ctx *parser.IdentifierContext) interface{} {
+func (ge *goExpreesionVisitor) VisitIdentifier(ctx *parser.IdentifierContext) any {
 	node := newEvaluationNode()
 	node.RawString = ctx.GetText()
 	node.Symbol = LITERAL
@@ -428,12 +428,15 @@ func (ge *goExpreesionVisitor) VisitIdentifier(ctx *parser.IdentifierContext) in
 	return node
 }
 
-func (ge *goExpreesionVisitor) VisitString_(ctx *parser.String_Context) interface{} {
+func (ge *goExpreesionVisitor) VisitString_(ctx *parser.String_Context) any {
 	node := newEvaluationNode()
 	node.RawString = ctx.GetText()
 	node.Symbol = STRING
 	if ctx.INTERPRETED_STRING_LIT() != nil {
-		node.Operator = makeLiteralOperator(ctx.INTERPRETED_STRING_LIT().GetText())
+		node.Operator = makeLiteralOperator(ctx.INTERPRETED_STRING_LIT().GetText()[1 : len(ctx.INTERPRETED_STRING_LIT().GetText())-1])
+	}
+	if ctx.SINGLE_STRING_LIT() != nil {
+		node.Operator = makeLiteralOperator(ctx.SINGLE_STRING_LIT().GetText()[1 : len(ctx.SINGLE_STRING_LIT().GetText())-1])
 	}
 	return node
 }
