@@ -98,16 +98,16 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "a+b",
+			name: "+b",
 			fields: fields{
 				stage:       nil,
 				ChecksTypes: true,
 			},
 			args: args{
-				expression: "0x123+345",
+				expression: "+345",
 				parameters: MapParameters{},
 			},
-			want:    float64(0x123 + 345),
+			want:    float64(+345),
 			wantErr: false,
 		},
 		{
@@ -124,16 +124,68 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "a-b",
+			name: "!true",
 			fields: fields{
 				stage:       nil,
 				ChecksTypes: true,
 			},
 			args: args{
-				expression: "123-345",
+				expression: "!true",
 				parameters: MapParameters{},
 			},
-			want:    float64(123 - 345),
+			want:    !true,
+			wantErr: false,
+		},
+		{
+			name: "!false",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "!false",
+				parameters: MapParameters{},
+			},
+			want:    !false,
+			wantErr: false,
+		},
+		{
+			name: "not true",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "not true",
+				parameters: MapParameters{},
+			},
+			want:    !true,
+			wantErr: false,
+		},
+		{
+			name: "not false",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "not false",
+				parameters: MapParameters{},
+			},
+			want:    !false,
+			wantErr: false,
+		},
+		{
+			name: "^b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "^1",
+				parameters: MapParameters{},
+			},
+			want:    float64(^1),
 			wantErr: false,
 		},
 		{
@@ -150,6 +202,201 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "a/b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "123/345",
+				parameters: MapParameters{},
+			},
+			want:    float64(123.0 / 345.0),
+			wantErr: false,
+		},
+		{
+			name: "a%b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "100%10",
+				parameters: MapParameters{},
+			},
+			want:    float64(100 % 10),
+			wantErr: false,
+		},
+		{
+			name: "a%b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "101%10",
+				parameters: MapParameters{},
+			},
+			want:    float64(101 % 10),
+			wantErr: false,
+		},
+		{
+			name: "a << b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "2 << 1",
+				parameters: MapParameters{},
+			},
+			want:    float64(2 << 1),
+			wantErr: false,
+		},
+		{
+			name: "a >> b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "2 >> 1",
+				parameters: MapParameters{},
+			},
+			want:    float64(2 >> 1),
+			wantErr: false,
+		},
+		{
+			name: "a & b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "100 & 50",
+				parameters: MapParameters{},
+			},
+			want:    float64(100 & 50),
+			wantErr: false,
+		},
+		{
+			name: "a &^ b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "100 &^ 50",
+				parameters: MapParameters{},
+			},
+			want:    float64(100 &^ 50),
+			wantErr: false,
+		},
+		{
+			name: "a+b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "0x123+345",
+				parameters: MapParameters{},
+			},
+			want:    float64(0x123 + 345),
+			wantErr: false,
+		},
+		{
+			name: "a-b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "123-345",
+				parameters: MapParameters{},
+			},
+			want:    float64(123 - 345),
+			wantErr: false,
+		},
+		{
+			name: "a | b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "100 | 50",
+				parameters: MapParameters{},
+			},
+			want:    float64(100 | 50),
+			wantErr: false,
+		},
+		{
+			name: "a ^ b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "100 ^ 50",
+				parameters: MapParameters{},
+			},
+			want:    float64(100 ^ 50),
+			wantErr: false,
+		},
+		{
+			name: "a == b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "123 == 345",
+				parameters: MapParameters{},
+			},
+			want:    bool(123 == 345),
+			wantErr: false,
+		},
+		{
+			name: "a == b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "345 == 345",
+				parameters: MapParameters{},
+			},
+			want:    bool(345 == 345),
+			wantErr: false,
+		},
+		{
+			name: "a != b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "123 != 345",
+				parameters: MapParameters{},
+			},
+			want:    bool(123 != 345),
+			wantErr: false,
+		},
+		{
+			name: "a != b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "345 != 345",
+				parameters: MapParameters{},
+			},
+			want:    bool(345 != 345),
+			wantErr: false,
+		},
+		{
 			name: "a > b",
 			fields: fields{
 				stage:       nil,
@@ -160,6 +407,71 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 				parameters: MapParameters{},
 			},
 			want:    bool(123 > 345),
+			wantErr: false,
+		},
+		{
+			name: "a > b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "345 > 345",
+				parameters: MapParameters{},
+			},
+			want:    bool(345 > 345),
+			wantErr: false,
+		},
+		{
+			name: "a > b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "345 > 123",
+				parameters: MapParameters{},
+			},
+			want:    bool(345 > 123),
+			wantErr: false,
+		},
+		{
+			name: "a >= b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "123 >= 345",
+				parameters: MapParameters{},
+			},
+			want:    bool(123 >= 345),
+			wantErr: false,
+		},
+		{
+			name: "a >= b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "345 >= 345",
+				parameters: MapParameters{},
+			},
+			want:    bool(345 >= 345),
+			wantErr: false,
+		},
+		{
+			name: "a >= b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "345 >= 123",
+				parameters: MapParameters{},
+			},
+			want:    bool(345 >= 123),
 			wantErr: false,
 		},
 		{
@@ -182,15 +494,260 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 				ChecksTypes: true,
 			},
 			args: args{
-				expression: "a1 < a2",
-				parameters: MapParameters{
-					"a1": 123,
-					"a2": 345,
-				},
+				expression: "345 < 345",
+				parameters: MapParameters{},
 			},
-			want:    bool(123 < 345),
+			want:    bool(345 < 345),
 			wantErr: false,
 		},
+		{
+			name: "a < b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "345 < 123",
+				parameters: MapParameters{},
+			},
+			want:    bool(345 < 123),
+			wantErr: false,
+		},
+		{
+			name: "a <= b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "123 <= 345",
+				parameters: MapParameters{},
+			},
+			want:    bool(123 <= 345),
+			wantErr: false,
+		},
+		{
+			name: "a <= b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "345 <= 345",
+				parameters: MapParameters{},
+			},
+			want:    bool(345 <= 345),
+			wantErr: false,
+		},
+		{
+			name: "a <= b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "345 <= 123",
+				parameters: MapParameters{},
+			},
+			want:    bool(345 <= 123),
+			wantErr: false,
+		},
+		{
+			name: "a && b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "true && true",
+				parameters: MapParameters{},
+			},
+			want:    true,
+			wantErr: false,
+		},
+		{
+			name: "a && b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "true && false",
+				parameters: MapParameters{},
+			},
+			want:    false,
+			wantErr: false,
+		},
+		{
+			name: "a && b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "false && false",
+				parameters: MapParameters{},
+			},
+			want:    bool(false),
+			wantErr: false,
+		},
+		{
+			name: "a || b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "true || true",
+				parameters: MapParameters{},
+			},
+			want:    bool(true),
+			wantErr: false,
+		},
+		{
+			name: "a || b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "true || false",
+				parameters: MapParameters{},
+			},
+			want:    bool(true),
+			wantErr: false,
+		},
+		{
+			name: "a || b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "false || false",
+				parameters: MapParameters{},
+			},
+			want:    bool(false),
+			wantErr: false,
+		},
+		{
+			name: "a and b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "true and true",
+				parameters: MapParameters{},
+			},
+			want:    bool(true),
+			wantErr: false,
+		},
+		{
+			name: "a and b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "true and false",
+				parameters: MapParameters{},
+			},
+			want:    bool(false),
+			wantErr: false,
+		},
+		{
+			name: "a and b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "false and false",
+				parameters: MapParameters{},
+			},
+			want:    bool(false),
+			wantErr: false,
+		},
+		{
+			name: "a or b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "true or true",
+				parameters: MapParameters{},
+			},
+			want:    bool(true),
+			wantErr: false,
+		},
+		{
+			name: "a or b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "true or false",
+				parameters: MapParameters{},
+			},
+			want:    bool(true),
+			wantErr: false,
+		},
+		{
+			name: "a or b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "false or false",
+				parameters: MapParameters{},
+			},
+			want:    bool(false),
+			wantErr: false,
+		},
+		{
+			name: "a in b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "123 in {123, \"dtr\",456}",
+				parameters: MapParameters{},
+			},
+			want:    bool(true),
+			wantErr: false,
+		},
+		{
+			name: "a in b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "123 in {345, \"dtr\",456}",
+				parameters: MapParameters{},
+			},
+			want:    bool(false),
+			wantErr: false,
+		},
+		{
+			name: "a in b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "123 in {}",
+				parameters: MapParameters{},
+			},
+			want:    bool(false),
+			wantErr: false,
+		},
+
 		{
 			name: "a1 * a2 - a2 + a2 * (a1 * a2 - a2 + a2)",
 			fields: fields{

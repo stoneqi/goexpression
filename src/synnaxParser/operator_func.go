@@ -219,7 +219,7 @@ func makeParameterOperator(parameterName string) EvaluationOperator {
 	}
 }
 
-// 左移
+// index
 func indexOperator(left any, right any, parameters Parameters) (any, error) {
 
 	leftValue := reflect.ValueOf(left)
@@ -636,13 +636,19 @@ func makeAccessorOperator(pair []string) EvaluationOperator {
 
 // in 函数
 func inOperator(left any, right any, parameters Parameters) (any, error) {
-
-	for _, value := range right.([]any) {
-		if left == value {
-			return true, nil
+	//leftValue := reflect.ValueOf(left)
+	rightValue := reflect.ValueOf(right)
+	if rightValue.Kind() == reflect.Array || rightValue.Kind() == reflect.Slice {
+		for i := 0; i < rightValue.Len(); i++ {
+			itemIndex := rightValue.Index(i).Interface()
+			if reflect.DeepEqual(left, itemIndex) {
+				return true, nil
+			}
 		}
+		return false, nil
 	}
-	return false, nil
+	return nil, errors.New("right value type is err: " + rightValue.Kind().String())
+
 }
 
 /*

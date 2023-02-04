@@ -48,7 +48,7 @@ primaryExpr:
 
 
 
-operand: basicLit | operandName | L_PAREN expression R_PAREN |  L_CURLY expressionList R_CURLY;
+operand: basicLit | operandName | L_PAREN expression R_PAREN |  L_CURLY (expressionList)? R_CURLY;
 
 operandName: identifier;
 slice_:
@@ -80,9 +80,7 @@ integer:
 
 expressionList: expression (COMMA expression)*;
 arguments:
-	L_PAREN (
-		expressionList
-	)? R_PAREN;
+	L_PAREN (expressionList)? R_PAREN;
 
 eos:
 	SEMI

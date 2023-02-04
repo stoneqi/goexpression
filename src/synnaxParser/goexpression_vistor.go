@@ -76,7 +76,7 @@ func (ge *goExpreesionVisitor) VisitExpression(ctx *parser.ExpressionContext) an
 		if ctx.CARET() != nil {
 			node.Symbol = CARET
 			node.Operator = bitwiseNotOperator
-			node.RightTypeCheck = isBool
+			//node.RightTypeCheck = isBool
 		}
 
 		rightNode := ctx.GetChildOfType(1, nil)
@@ -235,7 +235,14 @@ func (ge *goExpreesionVisitor) VisitExpression(ctx *parser.ExpressionContext) an
 			node.TypeCheck = nil
 		}
 		if ctx.QUESTION() != nil {
+			node.Symbol = QUESTION
 			node.Operator = conditionalOperator
+			//node.LeftTypeCheck = isBool
+			node.TypeErrorFormat = leftNode.GetText() + " value is not boolean "
+		}
+		if ctx.EN_IN() != nil {
+			node.Symbol = LOGICAL_IN
+			node.Operator = inOperator
 			//node.LeftTypeCheck = isBool
 			node.TypeErrorFormat = leftNode.GetText() + " value is not boolean "
 		}
@@ -293,9 +300,18 @@ func (ge *goExpreesionVisitor) VisitOperand(ctx *parser.OperandContext) any {
 	if ctx.Expression() != nil {
 		return ctx.Expression().Accept(ge).(*evaluationNode)
 	}
-	if ctx.ExpressionList() != nil {
-		return ctx.ExpressionList().Accept(ge).(*evaluationNode)
+	if ctx.L_CURLY() != nil && ctx.R_CURLY() != nil {
+		if ctx.ExpressionList() != nil {
+			return ctx.ExpressionList().Accept(ge).(*evaluationNode)
+		} else {
+			node := newEvaluationNode()
+			node.RawString = ctx.GetText()
+			node.Symbol = NIL
+			node.Operator = makeLiteralOperator([]interface{}{})
+			return node
+		}
 	}
+
 	return nil
 }
 
@@ -410,6 +426,13 @@ func (ge *goExpreesionVisitor) VisitExpressionList(ctx *parser.ExpressionListCon
 }
 
 func (ge *goExpreesionVisitor) VisitArguments(ctx *parser.ArgumentsContext) any {
+	if ctx.ExpressionList() == nil {
+		node := newEvaluationNode()
+		node.RawString = ctx.GetText()
+		node.Symbol = NIL
+		node.Operator = makeLiteralOperator([]interface{}{})
+		return node
+	}
 	return ctx.ExpressionList().Accept(ge).(*evaluationNode)
 }
 
