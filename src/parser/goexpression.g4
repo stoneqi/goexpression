@@ -88,7 +88,7 @@ eos:
 	| EOS;
 
 identifier: IDENTIFIER;
-string_: INTERPRETED_STRING_LIT | SINGLE_STRING_LIT;
+string_: INTERPRETED_STRING_LIT;
 
 // bool
 EN_TRUE:'True' 
@@ -184,10 +184,7 @@ IDENTIFIER
     ;
 
 // String literals
-
-RAW_STRING_LIT         : '`' ~'`'*                      '`';
 INTERPRETED_STRING_LIT : '"' (~["\\] | ESCAPED_VALUE)*  '"';
-SINGLE_STRING_LIT : '\'' (~["\\] | ESCAPED_VALUE)*  '\'';
 
 // Hidden tokens
 WS                     : [ \t]+             -> channel(HIDDEN);

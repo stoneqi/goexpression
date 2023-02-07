@@ -52,25 +52,25 @@ func (ge *goExpreesionVisitor) VisitExpression(ctx *parser.ExpressionContext) an
 		if ctx.PLUS() != nil {
 			node.Symbol = PLUS
 			node.Operator = unAryAddOperator
-			node.RightTypeCheck = isFloat64
+			node.RightTypeCheck = isNumber
 		}
 
 		if ctx.MINUS() != nil {
 			node.Symbol = MINUS
 			node.Operator = negateOperator
-			node.RightTypeCheck = isFloat64
+			node.RightTypeCheck = isNumber
 		}
 
 		if ctx.EXCLAMATION() != nil {
 			node.Symbol = EXCLAMATION
 			node.Operator = invertOperator
-			node.RightTypeCheck = isBool
+			//node.RightTypeCheck = isBool
 		}
 
 		if ctx.EN_NOT() != nil {
 			node.Symbol = EN_NOT
 			node.Operator = invertOperator
-			node.RightTypeCheck = isBool
+			//node.RightTypeCheck = isBool
 		}
 
 		if ctx.CARET() != nil {
@@ -102,76 +102,76 @@ func (ge *goExpreesionVisitor) VisitExpression(ctx *parser.ExpressionContext) an
 		if ctx.STAR() != nil {
 			node.Symbol = STAR
 			node.Operator = multiplyOperator
-			node.LeftTypeCheck = isFloat64
-			node.RightTypeCheck = isFloat64
+			node.LeftTypeCheck = isNumber
+			node.RightTypeCheck = isNumber
 			node.TypeCheck = nil
 		}
 		if ctx.DIV() != nil {
 			node.Symbol = DIV
 			node.Operator = divideOperator
-			node.LeftTypeCheck = isFloat64
-			node.RightTypeCheck = isFloat64
+			node.LeftTypeCheck = isNumber
+			node.RightTypeCheck = isNumber
 			node.TypeCheck = nil
 		}
 		if ctx.MOD() != nil {
 			node.Symbol = MOD
 			node.Operator = modulusOperator
-			node.LeftTypeCheck = isFloat64
-			node.RightTypeCheck = isFloat64
+			node.LeftTypeCheck = isNumber
+			node.RightTypeCheck = isNumber
 			node.TypeCheck = nil
 		}
 
 		if ctx.LSHIFT() != nil {
 			node.Symbol = LSHIFT
 			node.Operator = leftShiftOperator
-			node.LeftTypeCheck = isFloat64
-			node.RightTypeCheck = isFloat64
+			node.LeftTypeCheck = isNumber
+			node.RightTypeCheck = isNumber
 			node.TypeCheck = nil
 		}
 
 		if ctx.RSHIFT() != nil {
 			node.Symbol = RSHIFT
 			node.Operator = rightShiftOperator
-			node.LeftTypeCheck = isFloat64
-			node.RightTypeCheck = isFloat64
+			node.LeftTypeCheck = isNumber
+			node.RightTypeCheck = isNumber
 			node.TypeCheck = nil
 		}
 
 		if ctx.AMPERSAND() != nil {
 			node.Symbol = AMPERSAND
 			node.Operator = bitwiseAndOperator
-			node.LeftTypeCheck = isFloat64
-			node.RightTypeCheck = isFloat64
+			node.LeftTypeCheck = isNumber
+			node.RightTypeCheck = isNumber
 			node.TypeCheck = nil
 		}
 
 		if ctx.BIT_CLEAR() != nil {
 			node.Symbol = BIT_CLEAR
 			node.Operator = bitwiseAndNotOperator
-			node.LeftTypeCheck = isFloat64
-			node.RightTypeCheck = isFloat64
+			node.LeftTypeCheck = isNumber
+			node.RightTypeCheck = isNumber
 			node.TypeCheck = nil
 		}
 
 		if ctx.MINUS() != nil {
 			node.Symbol = MINUS
 			node.Operator = subtractOperator
-			node.LeftTypeCheck = isFloat64
-			node.RightTypeCheck = isFloat64
+			node.LeftTypeCheck = isNumber
+			node.RightTypeCheck = isNumber
 			node.TypeCheck = nil
 		}
 		if ctx.OR() != nil {
 			node.Symbol = OR
 			node.Operator = bitwiseOrOperator
-			node.LeftTypeCheck = isFloat64
-			node.RightTypeCheck = isFloat64
+			node.LeftTypeCheck = isNumber
+			node.RightTypeCheck = isNumber
 			node.TypeCheck = nil
 		}
 		if ctx.CARET() != nil {
 			node.Symbol = CARET
 			node.Operator = bitwiseXOROperator
-			node.LeftTypeCheck = isFloat64
-			node.RightTypeCheck = isFloat64
+			node.LeftTypeCheck = isNumber
+			node.RightTypeCheck = isNumber
 			node.TypeCheck = nil
 		}
 
@@ -180,7 +180,7 @@ func (ge *goExpreesionVisitor) VisitExpression(ctx *parser.ExpressionContext) an
 			node.Operator = equalOperator
 			node.LeftTypeCheck = nil
 			node.RightTypeCheck = nil
-			node.TypeCheck = comparatorTypeCheck
+			node.TypeCheck = nil
 		}
 
 		if ctx.NOT_EQUALS() != nil {
@@ -188,7 +188,7 @@ func (ge *goExpreesionVisitor) VisitExpression(ctx *parser.ExpressionContext) an
 			node.Operator = notEqualOperator
 			node.LeftTypeCheck = nil
 			node.RightTypeCheck = nil
-			node.TypeCheck = comparatorTypeCheck
+			node.TypeCheck = nil
 		}
 		if ctx.LESS() != nil {
 			node.Symbol = LESS
@@ -222,16 +222,16 @@ func (ge *goExpreesionVisitor) VisitExpression(ctx *parser.ExpressionContext) an
 		if ctx.LOGICAL_AND() != nil || ctx.EN_AND() != nil {
 			node.Symbol = LOGICAL_AND
 			node.Operator = andOperator
-			node.LeftTypeCheck = isBool
-			node.RightTypeCheck = isBool
+			//node.LeftTypeCheck = isBool
+			//node.RightTypeCheck = isBool
 			node.TypeCheck = nil
 		}
 
 		if ctx.LOGICAL_OR() != nil || ctx.EN_OR() != nil {
 			node.Symbol = LOGICAL_OR
 			node.Operator = orOperator
-			node.LeftTypeCheck = isBool
-			node.RightTypeCheck = isBool
+			//node.LeftTypeCheck = isBool
+			//node.RightTypeCheck = isBool
 			node.TypeCheck = nil
 		}
 		if ctx.QUESTION() != nil {
@@ -392,19 +392,19 @@ func (ge *goExpreesionVisitor) VisitInteger(ctx *parser.IntegerContext) any {
 	numStr := strings.Replace(ctx.GetText(), "_", "", -1)
 	if ctx.OCTAL_LIT() != nil {
 		num, _ := strconv.ParseInt(numStr[2:len(numStr)], 8, 64)
-		node.Operator = makeLiteralOperator(float64(num))
+		node.Operator = makeLiteralOperator(num)
 	}
 	if ctx.DECIMAL_LIT() != nil {
 		num, _ := strconv.ParseInt(numStr, 10, 64)
-		node.Operator = makeLiteralOperator(float64(num))
+		node.Operator = makeLiteralOperator(num)
 	}
 	if ctx.HEX_LIT() != nil {
 		num, _ := strconv.ParseInt(numStr[2:len(numStr)], 16, 64)
-		node.Operator = makeLiteralOperator(float64(num))
+		node.Operator = makeLiteralOperator(num)
 	}
 	if ctx.BINARY_LIT() != nil {
 		num, _ := strconv.ParseInt(numStr[2:len(numStr)], 2, 64)
-		node.Operator = makeLiteralOperator(float64(num))
+		node.Operator = makeLiteralOperator(num)
 	}
 
 	return node
@@ -456,10 +456,13 @@ func (ge *goExpreesionVisitor) VisitString_(ctx *parser.String_Context) any {
 	node.RawString = ctx.GetText()
 	node.Symbol = STRING
 	if ctx.INTERPRETED_STRING_LIT() != nil {
-		node.Operator = makeLiteralOperator(ctx.INTERPRETED_STRING_LIT().GetText()[1 : len(ctx.INTERPRETED_STRING_LIT().GetText())-1])
-	}
-	if ctx.SINGLE_STRING_LIT() != nil {
-		node.Operator = makeLiteralOperator(ctx.SINGLE_STRING_LIT().GetText()[1 : len(ctx.SINGLE_STRING_LIT().GetText())-1])
+		unquote, err := strconv.Unquote(ctx.INTERPRETED_STRING_LIT().GetText())
+		if err != nil {
+			node.Operator = makeLiteralOperator(ctx.INTERPRETED_STRING_LIT().GetText()[1 : len(ctx.INTERPRETED_STRING_LIT().GetText())-1])
+		} else {
+			node.Operator = makeLiteralOperator(unquote)
+		}
+		//node.Operator = makeLiteralOperator(ctx.INTERPRETED_STRING_LIT().GetText()[1 : len(ctx.INTERPRETED_STRING_LIT().GetText())-1])
 	}
 	return node
 }

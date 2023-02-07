@@ -26,5 +26,5 @@ func (p MapParameters) Get(name string) (any, error) {
 		return nil, errors.New(errorMessage)
 	}
 
-	return castToFloat64(value), nil
+	return value, nil
 }

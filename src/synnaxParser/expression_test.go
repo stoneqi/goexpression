@@ -1,17 +1,20 @@
 package parserSecond
 
 import (
+	"math"
 	"reflect"
 	"strings"
 	"testing"
 )
 
-func TestEvaluableExpression_evaluateStage(t *testing.T) {
+func TestEvaluableExpressionBasicLit_EvalString(t *testing.T) {
 	type fields struct {
+		stage       *evaluationNode
 		ChecksTypes bool
+		IsDebug     bool
 	}
 	type args struct {
-		stage      *evaluationNode
+		expression string
 		parameters Parameters
 	}
 	tests := []struct {
@@ -22,65 +25,495 @@ func TestEvaluableExpression_evaluateStage(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "",
+			name: "nil",
 			fields: fields{
+				stage:       nil,
 				ChecksTypes: true,
 			},
 			args: args{
-				stage: &evaluationNode{
-					Symbol: 0,
-					LeftOperator: &evaluationNode{
-						Symbol:          LITERAL,
-						LeftOperator:    nil,
-						RightOperator:   nil,
-						Operator:        makeAccessorOperator([]string{"a"}),
-						LeftTypeCheck:   nil,
-						RightTypeCheck:  nil,
-						TypeCheck:       nil,
-						TypeErrorFormat: "",
-					},
-					RightOperator: &evaluationNode{
-						Symbol:          LITERAL,
-						LeftOperator:    nil,
-						RightOperator:   nil,
-						Operator:        makeLiteralOperator(345.0),
-						LeftTypeCheck:   nil,
-						RightTypeCheck:  nil,
-						TypeCheck:       nil,
-						TypeErrorFormat: "",
-					},
-					Operator:        addOperator,
-					LeftTypeCheck:   isFloat64,
-					RightTypeCheck:  isFloat64,
-					TypeCheck:       nil,
-					TypeErrorFormat: "",
-				},
-				parameters: MapParameters{
-					"a": 123,
-				},
+				expression: "nil",
+				parameters: MapParameters{},
 			},
-			want:    468.0,
+			want:    nil,
+			wantErr: false,
+		},
+		{
+			name: "bool",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "true",
+				parameters: MapParameters{},
+			},
+			want:    bool(true),
+			wantErr: false,
+		},
+		{
+			name: "bool",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "false",
+				parameters: MapParameters{},
+			},
+			want:    bool(false),
+			wantErr: false,
+		},
+		{
+			name: "integer",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "0",
+				parameters: MapParameters{},
+			},
+			want:    int64(0),
+			wantErr: false,
+		},
+		{
+			name: "integer_max",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "9223372036854775807",
+				parameters: MapParameters{},
+			},
+			want:    int64(9223372036854775807),
+			wantErr: false,
+		},
+		{
+			name: "integer_min",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "-9223372036854775808",
+				parameters: MapParameters{},
+			},
+			want:    int64(-9223372036854775807),
+			wantErr: false,
+		},
+		{
+			name: "float",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "-0.0",
+				parameters: MapParameters{},
+			},
+			want:    -0.0,
+			wantErr: false,
+		},
+		{
+			name: "float",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "-3.2678668756546343435563242",
+				parameters: MapParameters{},
+			},
+			want:    -3.2678668756546343435563242,
+			wantErr: false,
+		},
+		{
+			name: "float_max",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "1.79769313486231570814527423731704356798070e+308",
+				parameters: MapParameters{},
+			},
+			want:    math.MaxFloat64,
+			wantErr: false,
+		},
+		{
+			name: "float_min",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "4.9406564584124654417656879286822137236505980e-324",
+				parameters: MapParameters{},
+			},
+			want:    math.SmallestNonzeroFloat64,
+			wantErr: false,
+		},
+		{
+			name: "string",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "\"3423asvas%6712你好\"",
+				parameters: MapParameters{},
+			},
+			want:    "3423asvas%6712你好",
+			wantErr: false,
+		},
+		{
+			name: "string",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "\"3423asvas%	6712你好\"",
+				parameters: MapParameters{},
+			},
+			want:    "3423asvas%	6712你好",
+			wantErr: false,
+		},
+		{
+			name: "string",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "\"3423QWERTYUIOPASDDFGHJKLZXCVBNM;[]\\\"/.,%6712你好\"",
+				parameters: MapParameters{},
+			},
+			want:    "3423QWERTYUIOPASDDFGHJKLZXCVBNM;[]\"/.,%6712你好",
+			wantErr: false,
+		},
+		{
+			name: "string",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "\"3423QWERTYUIOPASDDFGHJKLZXCVBNM;[]'/.,%6712你好\"",
+				parameters: MapParameters{},
+			},
+			want:    "3423QWERTYUIOPASDDFGHJKLZXCVBNM;[]'/.,%6712你好",
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			this := EvaluableExpression{
+			ee := &EvaluableExpression{
+				stage:       tt.fields.stage,
 				ChecksTypes: tt.fields.ChecksTypes,
+				IsDebug:     true,
 			}
-			got, err := this.evaluateStage(tt.args.stage, tt.args.parameters)
+			got, err := ee.EvalString(tt.args.expression, tt.args.parameters)
+			t.Logf("%s; got:%+v; type:%+v", strings.Join(ee.recordStep, "; "), got, reflect.TypeOf(got))
 			if (err != nil) != tt.wantErr {
-				t.Errorf("evaluateStage() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("EvalString() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("evaluateStage() got = %v, want %v", got, tt.want)
+				t.Errorf("EvalString() got = %+v, want %+v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestEvaluableExpression_EvalString(t *testing.T) {
+func TestEvaluableExpressionOperandName_EvalString(t *testing.T) {
+	type fields struct {
+		stage       *evaluationNode
+		ChecksTypes bool
+		IsDebug     bool
+	}
+	type args struct {
+		expression string
+		parameters Parameters
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    any
+		wantErr bool
+	}{
+		{
+			name: "a",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "a",
+				parameters: MapParameters{
+					"a": 1,
+				},
+			},
+			want:    int64(1),
+			wantErr: false,
+		},
+		{
+			name: "a",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "a",
+				parameters: MapParameters{
+					"a": true,
+				},
+			},
+			want:    true,
+			wantErr: false,
+		},
+		{
+			name: "a",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "a",
+				parameters: MapParameters{
+					"a": struct {
+						A int
+					}{A: 234},
+				},
+			},
+			want: struct {
+				A int
+			}{A: 234},
+			wantErr: false,
+		},
+		{
+			name: "a",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "a",
+				parameters: MapParameters{
+					"a": nil,
+				},
+			},
+			want:    nil,
+			wantErr: false,
+		},
+		{
+			name: "a",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "a",
+				parameters: MapParameters{
+					"a": 1.0,
+				},
+			},
+			want:    float64(1.0),
+			wantErr: false,
+		},
+		{
+			name: "a",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "a",
+				parameters: MapParameters{
+					"a": "aaaa",
+				},
+			},
+			want:    "aaaa",
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ee := &EvaluableExpression{
+				stage:       tt.fields.stage,
+				ChecksTypes: tt.fields.ChecksTypes,
+				IsDebug:     true,
+			}
+			got, err := ee.EvalString(tt.args.expression, tt.args.parameters)
+			t.Logf("%s; got:%+v; type:%+v", strings.Join(ee.recordStep, "; "), got, reflect.TypeOf(got))
+			if (err != nil) != tt.wantErr {
+				t.Errorf("EvalString() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("EvalString() got = %+v, want %+v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestEvaluableExpressionOperand_EvalString(t *testing.T) {
+	type fields struct {
+		stage       *evaluationNode
+		ChecksTypes bool
+		IsDebug     bool
+	}
+	type args struct {
+		expression string
+		parameters Parameters
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    any
+		wantErr bool
+	}{
+		{
+			name: "a",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "true",
+				parameters: MapParameters{},
+			},
+			want:    bool(true),
+			wantErr: false,
+		},
+		{
+			name: "a",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "true",
+				parameters: MapParameters{},
+			},
+			want:    bool(true),
+			wantErr: false,
+		},
+		{
+			name: "a or b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "false or false",
+				parameters: MapParameters{},
+			},
+			want:    bool(false),
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ee := &EvaluableExpression{
+				stage:       tt.fields.stage,
+				ChecksTypes: tt.fields.ChecksTypes,
+				IsDebug:     true,
+			}
+			got, err := ee.EvalString(tt.args.expression, tt.args.parameters)
+			t.Logf("%s; got:%+v; type:%+v", strings.Join(ee.recordStep, "; "), got, reflect.TypeOf(got))
+			if (err != nil) != tt.wantErr {
+				t.Errorf("EvalString() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("EvalString() got = %+v, want %+v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestEvaluableExpressionPrimaryExpr_EvalString(t *testing.T) {
+	type fields struct {
+		stage       *evaluationNode
+		ChecksTypes bool
+		IsDebug     bool
+	}
+	type args struct {
+		expression string
+		parameters Parameters
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    any
+		wantErr bool
+	}{
+		{
+			name: "a",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "true",
+				parameters: MapParameters{},
+			},
+			want:    bool(true),
+			wantErr: false,
+		},
+		{
+			name: "a",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "true",
+				parameters: MapParameters{},
+			},
+			want:    bool(true),
+			wantErr: false,
+		},
+		{
+			name: "a or b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "false or false",
+				parameters: MapParameters{},
+			},
+			want:    bool(false),
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ee := &EvaluableExpression{
+				stage:       tt.fields.stage,
+				ChecksTypes: tt.fields.ChecksTypes,
+				IsDebug:     true,
+			}
+			got, err := ee.EvalString(tt.args.expression, tt.args.parameters)
+			t.Logf("%s; got:%+v; type:%+v", strings.Join(ee.recordStep, "; "), got, reflect.TypeOf(got))
+			if (err != nil) != tt.wantErr {
+				t.Errorf("EvalString() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("EvalString() got = %+v, want %+v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestEvaluableExpressionStmt_EvalString(t *testing.T) {
 	type fields struct {
 		stage       *evaluationNode
 		ChecksTypes bool
@@ -107,7 +540,7 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 				expression: "+345",
 				parameters: MapParameters{},
 			},
-			want:    float64(+345),
+			want:    int64(+345),
 			wantErr: false,
 		},
 		{
@@ -120,7 +553,7 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 				expression: "-345",
 				parameters: MapParameters{},
 			},
-			want:    float64(-345),
+			want:    int64(-345),
 			wantErr: false,
 		},
 		{
@@ -185,7 +618,7 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 				expression: "^1",
 				parameters: MapParameters{},
 			},
-			want:    float64(^1),
+			want:    int64(^1),
 			wantErr: false,
 		},
 		{
@@ -198,7 +631,7 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 				expression: "123*345",
 				parameters: MapParameters{},
 			},
-			want:    float64(123 * 345),
+			want:    int64(123 * 345),
 			wantErr: false,
 		},
 		{
@@ -211,7 +644,7 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 				expression: "123/345",
 				parameters: MapParameters{},
 			},
-			want:    float64(123.0 / 345.0),
+			want:    int64(123 / 345),
 			wantErr: false,
 		},
 		{
@@ -224,7 +657,7 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 				expression: "100%10",
 				parameters: MapParameters{},
 			},
-			want:    float64(100 % 10),
+			want:    int64(100 % 10),
 			wantErr: false,
 		},
 		{
@@ -237,7 +670,7 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 				expression: "101%10",
 				parameters: MapParameters{},
 			},
-			want:    float64(101 % 10),
+			want:    int64(101 % 10),
 			wantErr: false,
 		},
 		{
@@ -250,7 +683,7 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 				expression: "2 << 1",
 				parameters: MapParameters{},
 			},
-			want:    float64(2 << 1),
+			want:    int64(2 << 1),
 			wantErr: false,
 		},
 		{
@@ -263,7 +696,7 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 				expression: "2 >> 1",
 				parameters: MapParameters{},
 			},
-			want:    float64(2 >> 1),
+			want:    int64(2 >> 1),
 			wantErr: false,
 		},
 		{
@@ -276,7 +709,7 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 				expression: "100 & 50",
 				parameters: MapParameters{},
 			},
-			want:    float64(100 & 50),
+			want:    int64(100 & 50),
 			wantErr: false,
 		},
 		{
@@ -289,7 +722,7 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 				expression: "100 &^ 50",
 				parameters: MapParameters{},
 			},
-			want:    float64(100 &^ 50),
+			want:    int64(100 &^ 50),
 			wantErr: false,
 		},
 		{
@@ -302,7 +735,7 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 				expression: "0x123+345",
 				parameters: MapParameters{},
 			},
-			want:    float64(0x123 + 345),
+			want:    int64(0x123 + 345),
 			wantErr: false,
 		},
 		{
@@ -315,7 +748,7 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 				expression: "123-345",
 				parameters: MapParameters{},
 			},
-			want:    float64(123 - 345),
+			want:    int64(123 - 345),
 			wantErr: false,
 		},
 		{
@@ -328,7 +761,7 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 				expression: "100 | 50",
 				parameters: MapParameters{},
 			},
-			want:    float64(100 | 50),
+			want:    int64(100 | 50),
 			wantErr: false,
 		},
 		{
@@ -341,7 +774,7 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 				expression: "100 ^ 50",
 				parameters: MapParameters{},
 			},
-			want:    float64(100 ^ 50),
+			want:    int64(100 ^ 50),
 			wantErr: false,
 		},
 		{
@@ -368,6 +801,45 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 				parameters: MapParameters{},
 			},
 			want:    bool(345 == 345),
+			wantErr: false,
+		},
+		{
+			name: "a == b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "345 == nil",
+				parameters: MapParameters{},
+			},
+			want:    bool(false),
+			wantErr: false,
+		},
+		{
+			name: "a == b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "345 != nil",
+				parameters: MapParameters{},
+			},
+			want:    bool(true),
+			wantErr: false,
+		},
+		{
+			name: "a == b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "\"ABC\" != \"AB\"",
+				parameters: MapParameters{},
+			},
+			want:    bool(true),
 			wantErr: false,
 		},
 		{
@@ -592,6 +1064,19 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "a && b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "1.0 && 0",
+				parameters: MapParameters{},
+			},
+			want:    false,
+			wantErr: false,
+		},
+		{
 			name: "a || b",
 			fields: fields{
 				stage:       nil,
@@ -747,7 +1232,105 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 			want:    bool(false),
 			wantErr: false,
 		},
-
+		{
+			name: "a?b:c",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "a1[0]?a1[1]:a1[2]",
+				parameters: MapParameters{
+					"a1": []string{
+						"true",
+						"b",
+						"c",
+						"d",
+					},
+				},
+			},
+			want:    "b",
+			wantErr: false,
+		},
+		{
+			name: "a?b:c",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "true? 1.0 : 2",
+				parameters: MapParameters{},
+			},
+			want:    1.0,
+			wantErr: false,
+		},
+		{
+			name: "a?b:c",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "1 ? 1.0 : 2",
+				parameters: MapParameters{},
+			},
+			want:    1.0,
+			wantErr: false,
+		},
+		{
+			name: "a?b:c",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "0 ? 1.0 : 2",
+				parameters: MapParameters{},
+			},
+			want:    int64(2),
+			wantErr: false,
+		},
+		{
+			name: "a?b:c",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "a1[0]?a1[1]:a1[2]",
+				parameters: MapParameters{
+					"a1": []string{
+						"",
+						"b",
+						"c",
+						"d",
+					},
+				},
+			},
+			want:    "c",
+			wantErr: false,
+		},
+		{
+			name: "a?b:c",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "true?a1[1]:a1[2]",
+				parameters: MapParameters{
+					"a1": []string{
+						"",
+						"b",
+						"c",
+						"d",
+					},
+				},
+			},
+			want:    "b",
+			wantErr: false,
+		},
 		{
 			name: "a1 * a2 - a2 + a2 * (a1 * a2 - a2 + a2)",
 			fields: fields{
@@ -761,7 +1344,7 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 					"a2": 345,
 				},
 			},
-			want:    float64(123.0*345.0 - 345.0 + 345.0*(123.0*345.0-345.0+345.0)),
+			want:    int64(123.0*345.0 - 345.0 + 345.0*(123.0*345.0-345.0+345.0)),
 			wantErr: false,
 		},
 		{
@@ -825,66 +1408,6 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "a?b:c",
-			fields: fields{
-				stage:       nil,
-				ChecksTypes: true,
-			},
-			args: args{
-				expression: "a1[0]?a1[1]:a1[2]",
-				parameters: MapParameters{
-					"a1": []string{
-						"true",
-						"b",
-						"c",
-						"d",
-					},
-				},
-			},
-			want:    "b",
-			wantErr: false,
-		},
-		{
-			name: "a?b:c",
-			fields: fields{
-				stage:       nil,
-				ChecksTypes: true,
-			},
-			args: args{
-				expression: "a1[0]?a1[1]:a1[2]",
-				parameters: MapParameters{
-					"a1": []string{
-						"",
-						"b",
-						"c",
-						"d",
-					},
-				},
-			},
-			want:    "c",
-			wantErr: false,
-		},
-		{
-			name: "a?b:c",
-			fields: fields{
-				stage:       nil,
-				ChecksTypes: true,
-			},
-			args: args{
-				expression: "true?a1[1]:a1[2]",
-				parameters: MapParameters{
-					"a1": []string{
-						"",
-						"b",
-						"c",
-						"d",
-					},
-				},
-			},
-			want:    "b",
-			wantErr: false,
-		},
-		{
 			name: "{0,1,2}",
 			fields: fields{
 				stage:       nil,
@@ -901,7 +1424,7 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 					},
 				},
 			},
-			want:    []any{0.0, 1.0, 2.0},
+			want:    []any{int64(0), int64(1), int64(2)},
 			wantErr: false,
 		},
 		{
@@ -921,7 +1444,7 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 					},
 				},
 			},
-			want:    1.0,
+			want:    int64(1),
 			wantErr: false,
 		},
 		{
@@ -951,7 +1474,7 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 					"a1": 4,
 				},
 			},
-			want:    2.0,
+			want:    int64(2),
 			wantErr: false,
 		},
 		{
@@ -970,6 +1493,83 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 			wantErr: false,
 		},
 		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ee := &EvaluableExpression{
+				stage:       tt.fields.stage,
+				ChecksTypes: tt.fields.ChecksTypes,
+				IsDebug:     true,
+			}
+			got, err := ee.EvalString(tt.args.expression, tt.args.parameters)
+			t.Logf("%s; got:%+v; type:%+v", strings.Join(ee.recordStep, "; "), got, reflect.TypeOf(got))
+			if (err != nil) != tt.wantErr {
+				t.Errorf("EvalString() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("EvalString() got = %+v, want %+v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestEvaluableExpression_EvalString(t *testing.T) {
+	type fields struct {
+		stage       *evaluationNode
+		ChecksTypes bool
+		IsDebug     bool
+	}
+	type args struct {
+		expression string
+		parameters Parameters
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    any
+		wantErr bool
+	}{
+		{
+			name: "a",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "true",
+				parameters: MapParameters{},
+			},
+			want:    bool(true),
+			wantErr: false,
+		},
+		{
+			name: "a",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "true",
+				parameters: MapParameters{},
+			},
+			want:    bool(true),
+			wantErr: false,
+		},
+		{
+			name: "a or b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "false or false",
+				parameters: MapParameters{},
+			},
+			want:    bool(false),
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

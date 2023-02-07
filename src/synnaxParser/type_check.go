@@ -33,10 +33,26 @@ func isBool(value any) bool {
 	return false
 }
 
+func isNumber(value any) bool {
+	if isFloat64(value) || isInt64(value) {
+		return true
+	}
+	return false
+}
+
 // 字符
 func isFloat64(value any) bool {
 	switch value.(type) {
-	case float64:
+	case float32, float64:
+		return true
+	}
+	return false
+}
+
+// 字符
+func isInt64(value any) bool {
+	switch value.(type) {
+	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
 		return true
 	}
 	return false
@@ -48,16 +64,22 @@ func additionTypeCheck(left any, right any) bool {
 	if isFloat64(left) && isFloat64(right) {
 		return true
 	}
-	if !isString(left) && !isString(right) {
-		return false
+	if isInt64(left) && isInt64(right) {
+		return true
 	}
-	return true
+	if isString(left) && isString(right) {
+		return true
+	}
+	return false
 }
 
 // 比较操作类型检测
 func comparatorTypeCheck(left any, right any) bool {
 
 	if isFloat64(left) && isFloat64(right) {
+		return true
+	}
+	if isInt64(left) && isInt64(right) {
 		return true
 	}
 	if isString(left) && isString(right) {

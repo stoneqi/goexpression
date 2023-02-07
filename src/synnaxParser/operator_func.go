@@ -10,11 +10,6 @@ import (
 	"strings"
 )
 
-var (
-	_true  = any(true)
-	_false = any(false)
-)
-
 // left
 func leftOperator(left any, right any, parameters Parameters) (any, error) {
 	return left, nil
@@ -27,111 +22,174 @@ func rightOperator(left any, right any, parameters Parameters) (any, error) {
 
 // 加法： +2=2
 func unAryAddOperator(left any, right any, parameters Parameters) (any, error) {
-
-	return right.(float64), nil
+	return right, nil
 }
 
 // 加法： "a"+"b" = "ab"; 1+2=3
 func addOperator(left any, right any, parameters Parameters) (any, error) {
 
-	// string concat if either are strings
 	if isString(left) || isString(right) {
 		return fmt.Sprintf("%v%v", left, right), nil
 	}
-
-	return left.(float64) + right.(float64), nil
+	if isInt64(left) && isInt64(right) {
+		return castToInt64(left) + castToInt64(right), nil
+	}
+	if (isFloat64(left) || isInt64(left)) && (isFloat64(right) || isInt64(right)) {
+		return castToFloat64(left) + castToFloat64(right), nil
+	}
+	return 0, errors.New("parameters type is nil")
 }
 
 // 减法： 1 - 3 = -2
 func subtractOperator(left any, right any, parameters Parameters) (any, error) {
-	return left.(float64) - right.(float64), nil
+	if isInt64(left) && isInt64(right) {
+		return castToInt64(left) - castToInt64(right), nil
+	}
+	if (isFloat64(left) || isInt64(left)) && (isFloat64(right) || isInt64(right)) {
+		return castToFloat64(left) - castToFloat64(right), nil
+	}
+	return 0, errors.New("parameters type is nil")
 }
 
 // 乘法：
 func multiplyOperator(left any, right any, parameters Parameters) (any, error) {
-	return left.(float64) * right.(float64), nil
+	if isInt64(left) && isInt64(right) {
+		return castToInt64(left) * castToInt64(right), nil
+	}
+	if (isFloat64(left) || isInt64(left)) && (isFloat64(right) || isInt64(right)) {
+		return castToFloat64(left) * castToFloat64(right), nil
+	}
+	return 0, errors.New("parameters type is nil")
 }
 
 // 除法
 func divideOperator(left any, right any, parameters Parameters) (any, error) {
-	return left.(float64) / right.(float64), nil
+	if isInt64(left) && isInt64(right) {
+		return castToInt64(left) / castToInt64(right), nil
+	}
+	if (isFloat64(left) || isInt64(left)) && (isFloat64(right) || isInt64(right)) {
+		return castToFloat64(left) / castToFloat64(right), nil
+	}
+	return 0, errors.New("parameters type is nil")
 }
 
 // 平方
-func exponentOperator(left any, right any, parameters Parameters) (any, error) {
-	return math.Pow(left.(float64), right.(float64)), nil
-}
+//func exponentOperator(left any, right any, parameters Parameters) (any, error) {
+//	return math.Pow(left.(float64), right.(float64)), nil
+//}
 
 // 取模
 func modulusOperator(left any, right any, parameters Parameters) (any, error) {
-	return math.Mod(left.(float64), right.(float64)), nil
+	if isInt64(left) && isInt64(right) {
+		return castToInt64(left) % castToInt64(right), nil
+	}
+	if (isFloat64(left) || isInt64(left)) && (isFloat64(right) || isInt64(right)) {
+		return math.Mod(castToFloat64(left), castToFloat64(right)), nil
+	}
+	return 0, errors.New("parameters type is nil")
 }
 
 // 大于等于
 func gteOperator(left any, right any, parameters Parameters) (any, error) {
 	if isString(left) && isString(right) {
-		return boolIface(left.(string) >= right.(string)), nil
+		return left.(string) >= right.(string), nil
 	}
-	return boolIface(left.(float64) >= right.(float64)), nil
+	if isInt64(left) && isInt64(right) {
+		return castToInt64(left) >= castToInt64(right), nil
+	}
+	if (isFloat64(left) || isInt64(left)) && (isFloat64(right) || isInt64(right)) {
+		return castToFloat64(left) >= castToFloat64(right), nil
+	}
+	return 0, errors.New("parameters type is nil")
 }
 
 // 大于
 func gtOperator(left any, right any, parameters Parameters) (any, error) {
 	if isString(left) && isString(right) {
-		return boolIface(left.(string) > right.(string)), nil
+		return left.(string) > right.(string), nil
 	}
-	return boolIface(left.(float64) > right.(float64)), nil
+	if isInt64(left) && isInt64(right) {
+		return castToInt64(left) > castToInt64(right), nil
+	}
+	if (isFloat64(left) || isInt64(left)) && (isFloat64(right) || isInt64(right)) {
+		return castToFloat64(left) > castToFloat64(right), nil
+	}
+	return 0, errors.New("parameters type is nil")
 }
 
 // 小于等于
 func lteOperator(left any, right any, parameters Parameters) (any, error) {
 	if isString(left) && isString(right) {
-		return boolIface(left.(string) <= right.(string)), nil
+		return left.(string) <= right.(string), nil
 	}
-	return boolIface(left.(float64) <= right.(float64)), nil
+	if isInt64(left) && isInt64(right) {
+		return castToInt64(left) <= castToInt64(right), nil
+	}
+	if (isFloat64(left) || isInt64(left)) && (isFloat64(right) || isInt64(right)) {
+		return castToFloat64(left) <= castToFloat64(right), nil
+	}
+	return 0, errors.New("parameters type is nil")
 }
 
 // 小于
 func ltOperator(left any, right any, parameters Parameters) (any, error) {
 	if isString(left) && isString(right) {
-		return boolIface(left.(string) < right.(string)), nil
+		return left.(string) < right.(string), nil
 	}
-	return boolIface(left.(float64) < right.(float64)), nil
+	if isInt64(left) && isInt64(right) {
+		return castToInt64(left) < castToInt64(right), nil
+	}
+	if (isFloat64(left) || isInt64(left)) && (isFloat64(right) || isInt64(right)) {
+		return castToFloat64(left) < castToFloat64(right), nil
+	}
+	return 0, errors.New("parameters type is nil")
 }
 
 // 等于
 func equalOperator(left any, right any, parameters Parameters) (any, error) {
-	return boolIface(reflect.DeepEqual(left, right)), nil
+	return reflect.DeepEqual(left, right), nil
 }
 
 // 不等于
 func notEqualOperator(left any, right any, parameters Parameters) (any, error) {
-	return boolIface(!reflect.DeepEqual(left, right)), nil
+	return !reflect.DeepEqual(left, right), nil
 }
 
 // and
 func andOperator(left any, right any, parameters Parameters) (any, error) {
-	return boolIface(left.(bool) && right.(bool)), nil
+	return boolJudge(left) && boolJudge(right), nil
 }
 
 // or
 func orOperator(left any, right any, parameters Parameters) (any, error) {
-	return boolIface(left.(bool) || right.(bool)), nil
+	return boolJudge(left) || boolJudge(right), nil
 }
 
 // 取负数
 func negateOperator(left any, right any, parameters Parameters) (any, error) {
-	return -right.(float64), nil
+	if isInt64(right) {
+		return -castToInt64(right), nil
+	}
+	if isFloat64(right) {
+		return -castToFloat64(right), nil
+	}
+	return 0, errors.New("parameters type is nil")
 }
 
 // 取反
 func invertOperator(left any, right any, parameters Parameters) (any, error) {
-	return boolIface(!right.(bool)), nil
+	return !boolJudge(right), nil
 }
 
 // 按位取反
 func bitwiseNotOperator(left any, right any, parameters Parameters) (any, error) {
-	return float64(^int64(right.(float64))), nil
+	if isInt64(right) {
+		return ^castToInt64(right), nil
+	}
+	if isFloat64(right) {
+		return ^int64(castToFloat64(right)), nil
+	}
+	return 0, errors.New("parameters type is nil")
 }
 
 //func ternaryIfOperator(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
@@ -178,32 +236,68 @@ func notRegexOperator(left any, right any, parameters Parameters) (any, error) {
 
 // 二元按位或
 func bitwiseOrOperator(left any, right any, parameters Parameters) (any, error) {
-	return float64(int64(left.(float64)) | int64(right.(float64))), nil
+	if isInt64(left) && isInt64(right) {
+		return castToInt64(left) | castToInt64(right), nil
+	}
+	if (isFloat64(left) || isInt64(left)) && (isFloat64(right) || isInt64(right)) {
+		return float64(int64(castToFloat64(left)) | int64(castToFloat64(right))), nil
+	}
+	return 0, errors.New("parameters type is nil")
 }
 
 // 二元按位且
 func bitwiseAndOperator(left any, right any, parameters Parameters) (any, error) {
-	return float64(int64(left.(float64)) & int64(right.(float64))), nil
+	if isInt64(left) && isInt64(right) {
+		return castToInt64(left) & castToInt64(right), nil
+	}
+	if (isFloat64(left) || isInt64(left)) && (isFloat64(right) || isInt64(right)) {
+		return float64(int64(castToFloat64(left)) & int64(castToFloat64(right))), nil
+	}
+	return 0, errors.New("parameters type is nil")
 }
 
 // 二元按位异或
 func bitwiseXOROperator(left any, right any, parameters Parameters) (any, error) {
-	return float64(int64(left.(float64)) ^ int64(right.(float64))), nil
+	if isInt64(left) && isInt64(right) {
+		return castToInt64(left) ^ castToInt64(right), nil
+	}
+	if (isFloat64(left) || isInt64(left)) && (isFloat64(right) || isInt64(right)) {
+		return float64(int64(castToFloat64(left)) ^ int64(castToFloat64(right))), nil
+	}
+	return 0, errors.New("parameters type is nil")
 }
 
 // 位清零
 func bitwiseAndNotOperator(left any, right any, parameters Parameters) (any, error) {
-	return float64(int64(left.(float64)) &^ int64(right.(float64))), nil
+	if isInt64(left) && isInt64(right) {
+		return castToInt64(left) &^ castToInt64(right), nil
+	}
+	if (isFloat64(left) || isInt64(left)) && (isFloat64(right) || isInt64(right)) {
+		return float64(int64(castToFloat64(left)) &^ int64(castToFloat64(right))), nil
+	}
+	return 0, errors.New("parameters type is nil")
 }
 
 // 左移
 func leftShiftOperator(left any, right any, parameters Parameters) (any, error) {
-	return float64(uint64(left.(float64)) << uint64(right.(float64))), nil
+	if isInt64(left) && isInt64(right) {
+		return castToInt64(left) << castToInt64(right), nil
+	}
+	if (isFloat64(left) || isInt64(left)) && (isFloat64(right) || isInt64(right)) {
+		return float64(int64(castToFloat64(left)) << int64(castToFloat64(right))), nil
+	}
+	return 0, errors.New("parameters type is nil")
 }
 
 // 左移
 func rightShiftOperator(left any, right any, parameters Parameters) (any, error) {
-	return float64(uint64(left.(float64)) >> uint64(right.(float64))), nil
+	if isInt64(left) && isInt64(right) {
+		return castToInt64(left) >> castToInt64(right), nil
+	}
+	if (isFloat64(left) || isInt64(left)) && (isFloat64(right) || isInt64(right)) {
+		return float64(int64(castToFloat64(left)) >> int64(castToFloat64(right))), nil
+	}
+	return 0, errors.New("parameters type is nil")
 }
 
 // 获取参数值
@@ -214,7 +308,12 @@ func makeParameterOperator(parameterName string) EvaluationOperator {
 		if err != nil {
 			return nil, err
 		}
-
+		if isInt64(value) {
+			return castToInt64(value), nil
+		}
+		if isFloat64(value) {
+			return castToFloat64(value), nil
+		}
 		return value, nil
 	}
 }
@@ -234,8 +333,14 @@ func indexOperator(left any, right any, parameters Parameters) (any, error) {
 	}
 
 	if leftValue.Kind() == reflect.Array || leftValue.Kind() == reflect.Slice {
-		indexFloat, ok := right.(float64)
-		if !ok {
+		var indexFloat int64 = -1
+		if isInt64(right) {
+			indexFloat = castToInt64(right)
+		}
+		if isFloat64(right) {
+			indexFloat = int64(castToFloat64(right))
+		}
+		if indexFloat < 0 {
 			return nil, errors.New("index no int in array")
 		}
 		value := leftValue.Index(int(indexFloat))
@@ -314,18 +419,25 @@ func makeSliceOperator(left any, right any, parameters Parameters) (any, error) 
 	if !ok {
 		return nil, errors.New("slice index is not array")
 	}
-	for _, i2 := range rightValue {
-		if _, ok := i2.(float64); !ok {
-			return nil, errors.New("slice index is not num")
-		}
+	var leftIndex int64 = -1
+	if isInt64(rightValue[0]) {
+		leftIndex = castToInt64(rightValue[0])
 	}
-	leftIndex := rightValue[0].(float64)
-	rightIndex := rightValue[1].(float64)
+	if isFloat64(rightValue[0]) {
+		leftIndex = int64(castToFloat64(rightValue[0]))
+	}
+	var rightIndex int64 = 0
+	if isInt64(rightValue[1]) {
+		rightIndex = castToInt64(rightValue[1])
+	}
+	if isFloat64(rightValue[1]) {
+		rightIndex = int64(castToFloat64(rightValue[1]))
+	}
 
 	if len(rightValue) == 2 {
 		leftValue := reflect.ValueOf(left)
 		if leftValue.Kind() == reflect.Array || leftValue.Kind() == reflect.Slice {
-			if int(leftIndex) < 0 || int(rightIndex) > leftValue.Len() {
+			if int(leftIndex) < 0 || rightIndex == 0 || int(rightIndex) > leftValue.Len() {
 				return nil, errors.New("slice bounds out of range")
 			}
 			value := leftValue.Slice(int(leftIndex), int(rightIndex))
@@ -615,7 +727,7 @@ func makeAccessorOperator(pair []string) EvaluationOperator {
 			return nil, errors.New("Method call '" + pair[0] + "." + pair[1] + "' did not return either one value, or a value and an error. Cannot interpret meaning.")
 		}
 
-		value = castToFloat64(value)
+		//value = castToFloat64(value)
 		return value, nil
 	}
 }
@@ -649,15 +761,4 @@ func inOperator(left any, right any, parameters Parameters) (any, error) {
 	}
 	return nil, errors.New("right value type is err: " + rightValue.Kind().String())
 
-}
-
-/*
-Converting a boolean to an interface{} requires an allocation.
-We can use interned bools to avoid this cost.
-*/
-func boolIface(b bool) any {
-	if b {
-		return _true
-	}
-	return _false
 }
