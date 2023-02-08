@@ -340,7 +340,7 @@ func indexOperator(left any, right any, parameters Parameters) (any, error) {
 		if isFloat64(right) {
 			indexFloat = int64(castToFloat64(right))
 		}
-		if indexFloat < 0 {
+		if indexFloat < 0 || indexFloat >= int64(leftValue.Len()) {
 			return nil, errors.New("index no int in array")
 		}
 		value := leftValue.Index(int(indexFloat))
@@ -388,7 +388,7 @@ func makeFunctionOperator(left any, right any, parameters Parameters) (any, erro
 	fun, ok := left.(ExpressionFunction)
 
 	if !ok {
-		return nil, errors.New("no Parameters")
+		return nil, errors.New("no Function type")
 	}
 	switch right.(type) {
 	case []any:
@@ -437,7 +437,7 @@ func makeSliceOperator(left any, right any, parameters Parameters) (any, error) 
 	if len(rightValue) == 2 {
 		leftValue := reflect.ValueOf(left)
 		if leftValue.Kind() == reflect.Array || leftValue.Kind() == reflect.Slice {
-			if int(leftIndex) < 0 || rightIndex == 0 || int(rightIndex) > leftValue.Len() {
+			if int(leftIndex) < 0 || rightIndex == 0 || int(rightIndex) > leftValue.Len() || leftIndex >= rightIndex {
 				return nil, errors.New("slice bounds out of range")
 			}
 			value := leftValue.Slice(int(leftIndex), int(rightIndex))

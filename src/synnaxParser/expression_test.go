@@ -177,7 +177,7 @@ func TestEvaluableExpressionBasicLit_EvalString(t *testing.T) {
 				expression: "\"3423asvas%	6712你好\"",
 				parameters: MapParameters{},
 			},
-			want:    "3423asvas%	6712你好",
+			want: "3423asvas%	6712你好",
 			wantErr: false,
 		},
 		{
@@ -377,42 +377,94 @@ func TestEvaluableExpressionOperand_EvalString(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "a",
+			name: "L_PAREN expression R_PAREN",
 			fields: fields{
 				stage:       nil,
 				ChecksTypes: true,
 			},
 			args: args{
-				expression: "true",
+				expression: "(true)",
 				parameters: MapParameters{},
 			},
 			want:    bool(true),
 			wantErr: false,
 		},
 		{
-			name: "a",
+			name: "L_PAREN expression R_PAREN",
 			fields: fields{
 				stage:       nil,
 				ChecksTypes: true,
 			},
 			args: args{
-				expression: "true",
+				expression: "(true or false)",
 				parameters: MapParameters{},
 			},
 			want:    bool(true),
 			wantErr: false,
 		},
 		{
-			name: "a or b",
+			name: "L_PAREN expression R_PAREN",
 			fields: fields{
 				stage:       nil,
 				ChecksTypes: true,
 			},
 			args: args{
-				expression: "false or false",
+				expression: "(100 + 200)",
 				parameters: MapParameters{},
 			},
-			want:    bool(false),
+			want:    int64(300),
+			wantErr: false,
+		},
+		{
+			name: "L_CURLY (expressionList)? R_CURLY",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "{}",
+				parameters: MapParameters{},
+			},
+			want:    []interface{}{},
+			wantErr: false,
+		},
+		{
+			name: "L_CURLY (expressionList)? R_CURLY",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "{100,200,300}",
+				parameters: MapParameters{},
+			},
+			want:    []interface{}{int64(100), int64(200), int64(300)},
+			wantErr: false,
+		},
+		{
+			name: "L_CURLY (expressionList)? R_CURLY",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "{100,200,300,100,200,300,100,200,300,100,200,300,100,200,300}",
+				parameters: MapParameters{},
+			},
+			want:    []interface{}{int64(100), int64(200), int64(300), int64(100), int64(200), int64(300), int64(100), int64(200), int64(300), int64(100), int64(200), int64(300), int64(100), int64(200), int64(300)},
+			wantErr: false,
+		},
+		{
+			name: "L_CURLY (expressionList)? R_CURLY",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "{100,\"aaa\",0.2}",
+				parameters: MapParameters{},
+			},
+			want:    []interface{}{int64(100), "aaa", 0.2},
 			wantErr: false,
 		},
 	}
@@ -454,42 +506,161 @@ func TestEvaluableExpressionPrimaryExpr_EvalString(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "a",
+			name: "index",
 			fields: fields{
 				stage:       nil,
 				ChecksTypes: true,
 			},
 			args: args{
-				expression: "true",
+				expression: "{1,2,3}[0]",
 				parameters: MapParameters{},
 			},
-			want:    bool(true),
+			want:    int64(1),
 			wantErr: false,
 		},
 		{
-			name: "a",
+			name: "index",
 			fields: fields{
 				stage:       nil,
 				ChecksTypes: true,
 			},
 			args: args{
-				expression: "true",
+				expression: "{1,2,3}[1]",
 				parameters: MapParameters{},
 			},
-			want:    bool(true),
+			want:    int64(2),
 			wantErr: false,
 		},
 		{
-			name: "a or b",
+			name: "index",
 			fields: fields{
 				stage:       nil,
 				ChecksTypes: true,
 			},
 			args: args{
-				expression: "false or false",
+				expression: "{1,2,3}[2]",
 				parameters: MapParameters{},
 			},
-			want:    bool(false),
+			want:    int64(3),
+			wantErr: false,
+		},
+		{
+			name: "index",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "{1,2,3}[-1]",
+				parameters: MapParameters{},
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "index",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "{1,2,3}[3]",
+				parameters: MapParameters{},
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "slice_",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "{1,2,3}[1:2]",
+				parameters: MapParameters{},
+			},
+			want:    []interface{}{int64(2)},
+			wantErr: false,
+		},
+		{
+			name: "slice_",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "{1,2,3}[0:3]",
+				parameters: MapParameters{},
+			},
+			want:    []interface{}{int64(1), int64(2), int64(3)},
+			wantErr: false,
+		},
+		{
+			name: "slice_",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "{1,2,3}[2:3]",
+				parameters: MapParameters{},
+			},
+			want:    []interface{}{int64(3)},
+			wantErr: false,
+		},
+		{
+			name: "slice_",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "{1,2,3}[0:4]",
+				parameters: MapParameters{},
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "slice_",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "{1,2,3}[-1:4]",
+				parameters: MapParameters{},
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "slice_",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "{1,2,3}[2:1]",
+				parameters: MapParameters{},
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "arguments",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "aa()",
+				parameters: MapParameters{
+					"aa": func(arguments ...any) (any, error) { return 3, nil },
+				},
+			},
+			want:    int64(3),
 			wantErr: false,
 		},
 	}
