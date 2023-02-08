@@ -385,7 +385,7 @@ func makeFunctionOperator(left any, right any, parameters Parameters) (any, erro
 		return nil, errors.New("no Parameters")
 	}
 
-	fun, ok := left.(ExpressionFunction)
+	fun, ok := left.(func(arguments ...any) (any, error))
 
 	if !ok {
 		return nil, errors.New("no Function type")
