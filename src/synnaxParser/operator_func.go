@@ -384,18 +384,33 @@ func makeFunctionOperator(left any, right any, parameters Parameters) (any, erro
 	if right == nil {
 		return nil, errors.New("no Parameters")
 	}
-
-	fun, ok := left.(func(arguments ...any) (any, error))
-
+	rightValue, ok := right.([]any)
 	if !ok {
-		return nil, errors.New("no Function type")
+		return nil, errors.New("Parameters error")
 	}
-	switch right.(type) {
-	case []any:
-		return fun(right.([]any)...)
-	default:
-		return fun(right)
+
+	funValue := reflect.ValueOf(left)
+	funType := reflect.TypeOf(left)
+	if funType.NumOut() != 2 || funType.NumIn() != len(rightValue) {
+		return nil, errors.New("Parameters is no two")
 	}
+	if funType.Out(1).Name() != "error" {
+		return nil, errors.New("Parameters is no two err type：" + funType.Out(1).Name())
+	}
+	var params []reflect.Value
+	for i := 0; i < funType.NumIn(); i++ {
+		if funType.In(i).Name() != reflect.TypeOf(rightValue[i]).Name() {
+			return nil, errors.New(strconv.Itoa(i) + "th parameter need " + funType.In(i).String())
+		}
+		params = append(params, reflect.ValueOf(rightValue[i]))
+	}
+
+	ret := funValue.Call(params)
+	var err error
+	if !ret[1].IsNil() {
+		err = ret[1].Interface().(error)
+	}
+	return ret[0].Interface(), err
 }
 
 //// 函数执行

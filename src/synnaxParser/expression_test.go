@@ -177,7 +177,7 @@ func TestEvaluableExpressionBasicLit_EvalString(t *testing.T) {
 				expression: "\"3423asvas%	6712你好\"",
 				parameters: MapParameters{},
 			},
-			want: "3423asvas%	6712你好",
+			want:    "3423asvas%	6712你好",
 			wantErr: false,
 		},
 		{
@@ -657,7 +657,22 @@ func TestEvaluableExpressionPrimaryExpr_EvalString(t *testing.T) {
 			args: args{
 				expression: "aa()",
 				parameters: MapParameters{
-					"aa": func(arguments ...any) (any, error) { return 3, nil },
+					"aa": func() (any, error) { return 3, nil },
+				},
+			},
+			want:    int(3),
+			wantErr: false,
+		},
+		{
+			name: "arguments",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "aa(1,2)",
+				parameters: MapParameters{
+					"aa": func(a int64, b int64) (any, error) { return a + b, nil },
 				},
 			},
 			want:    int64(3),
