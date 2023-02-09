@@ -384,33 +384,17 @@ func makeFunctionOperator(left any, right any, parameters Parameters) (any, erro
 	if right == nil {
 		return nil, errors.New("no Parameters")
 	}
-	rightValue, ok := right.([]any)
+
+	fun, ok := left.(func(arguments ...any) (any, error))
 	if !ok {
-		return nil, errors.New("Parameters error")
+		return nil, errors.New("left is not func type")
 	}
-
-	funValue := reflect.ValueOf(left)
-	funType := reflect.TypeOf(left)
-	if funType.NumOut() != 2 || funType.NumIn() != len(rightValue) {
-		return nil, errors.New("Parameters is no two")
+	switch right.(type) {
+	case []any:
+		return fun(right.([]any)...)
+	default:
+		return fun(right)
 	}
-	if funType.Out(1).Name() != "error" {
-		return nil, errors.New("Parameters is no two err type：" + funType.Out(1).Name())
-	}
-	var params []reflect.Value
-	for i := 0; i < funType.NumIn(); i++ {
-		if funType.In(i).Name() != reflect.TypeOf(rightValue[i]).Name() {
-			return nil, errors.New(strconv.Itoa(i) + "th parameter need " + funType.In(i).String())
-		}
-		params = append(params, reflect.ValueOf(rightValue[i]))
-	}
-
-	ret := funValue.Call(params)
-	var err error
-	if !ret[1].IsNil() {
-		err = ret[1].Interface().(error)
-	}
-	return ret[0].Interface(), err
 }
 
 //// 函数执行
@@ -607,15 +591,13 @@ func makeAccessOperator(pair string) EvaluationOperator {
 			coreValue = coreValue.Elem()
 		}
 
-		if coreValue.Kind() != reflect.Struct && coreValue.Kind() != reflect.Map {
+		if coreValue.Kind() != reflect.Struct {
 			return nil, errors.New("Unable to access '" + pair + "', '" + coreValue.String() + "' is not a struct or map")
 		}
 
-		var res any
-
 		field := coreValue.FieldByName(pair)
 		if field.IsValid() {
-			res = field.Interface()
+			return field.Interface(), nil
 		}
 
 		method := coreValue.MethodByName(pair)
@@ -624,10 +606,10 @@ func makeAccessOperator(pair string) EvaluationOperator {
 				method = corePtrVal.MethodByName(pair)
 			}
 			if method.IsValid() {
-				res = method.Interface()
+				return method.Interface(), nil
 			}
 		}
-		return res, nil
+		return nil, errors.New("")
 	}
 }
 

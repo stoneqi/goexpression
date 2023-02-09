@@ -57,7 +57,59 @@ func TestEvaluableExpressionBasicLit_EvalString(t *testing.T) {
 				ChecksTypes: true,
 			},
 			args: args{
+				expression: "True",
+				parameters: MapParameters{},
+			},
+			want:    bool(true),
+			wantErr: false,
+		},
+		{
+			name: "bool",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "TRUE",
+				parameters: MapParameters{},
+			},
+			want:    bool(true),
+			wantErr: false,
+		},
+		{
+			name: "bool",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
 				expression: "false",
+				parameters: MapParameters{},
+			},
+			want:    bool(false),
+			wantErr: false,
+		},
+		{
+			name: "bool",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "False",
+				parameters: MapParameters{},
+			},
+			want:    bool(false),
+			wantErr: false,
+		},
+		{
+			name: "bool",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "FALSE",
 				parameters: MapParameters{},
 			},
 			want:    bool(false),
@@ -87,6 +139,84 @@ func TestEvaluableExpressionBasicLit_EvalString(t *testing.T) {
 				parameters: MapParameters{},
 			},
 			want:    int64(9223372036854775807),
+			wantErr: false,
+		},
+		{
+			name: "integer_b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "0b0110010",
+				parameters: MapParameters{},
+			},
+			want:    int64(0b0110010),
+			wantErr: false,
+		},
+		{
+			name: "integer_b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "0B0110010",
+				parameters: MapParameters{},
+			},
+			want:    int64(0b0110010),
+			wantErr: false,
+		},
+		{
+			name: "integer_o",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "0o0110010",
+				parameters: MapParameters{},
+			},
+			want:    int64(0o0110010),
+			wantErr: false,
+		},
+		{
+			name: "integer_o",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "0O0110010",
+				parameters: MapParameters{},
+			},
+			want:    int64(0o0110010),
+			wantErr: false,
+		},
+		{
+			name: "integer_o",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "0x0110010",
+				parameters: MapParameters{},
+			},
+			want:    int64(0x0110010),
+			wantErr: false,
+		},
+		{
+			name: "integer_o",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "0X0110010",
+				parameters: MapParameters{},
+			},
+			want:    int64(0x0110010),
 			wantErr: false,
 		},
 		{
@@ -655,9 +785,9 @@ func TestEvaluableExpressionPrimaryExpr_EvalString(t *testing.T) {
 				ChecksTypes: true,
 			},
 			args: args{
-				expression: "aa()",
+				expression: "pass()",
 				parameters: MapParameters{
-					"aa": func() (any, error) { return 3, nil },
+					"pass": func(arguments ...any) (any, error) { return 3, nil },
 				},
 			},
 			want:    int(3),
@@ -670,12 +800,82 @@ func TestEvaluableExpressionPrimaryExpr_EvalString(t *testing.T) {
 				ChecksTypes: true,
 			},
 			args: args{
-				expression: "aa(1,2)",
+				expression: "pass(1)",
 				parameters: MapParameters{
-					"aa": func(a int64, b int64) (any, error) { return a + b, nil },
+					"pass": func(arguments ...any) (any, error) { return arguments[0], nil },
 				},
 			},
 			want:    int64(3),
+			wantErr: false,
+		},
+		{
+			name: "arguments",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "sum(1,2)",
+				parameters: MapParameters{
+					"sum": func(arguments ...any) (any, error) { return arguments[0].(int64) + arguments[1].(int64), nil },
+				},
+			},
+			want:    int64(3),
+			wantErr: false,
+		},
+		{
+			name: "arguments",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "sum(1, sum(2, 3), 2 + 2, true ? 4 : 5)",
+				parameters: MapParameters{
+					"sum": func(arguments ...any) (any, error) { return arguments[0].(int64) + arguments[1].(int64), nil },
+				},
+			},
+			want:    int64(6),
+			wantErr: false,
+		},
+		{
+			name: "IDENTIFIER",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "a.B",
+				parameters: MapParameters{
+					"a": struct {
+						B int
+					}{B: 34},
+				},
+			},
+			want:    int(34),
+			wantErr: false,
+		},
+		{
+			name: "IDENTIFIER",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "a.B.C",
+				parameters: MapParameters{
+					"a": struct {
+						B struct {
+							C int64
+						}
+					}{B: struct {
+						C int64
+					}{
+						C: 64,
+					}},
+				},
+			},
+			want:    int64(64),
 			wantErr: false,
 		},
 	}
@@ -699,7 +899,7 @@ func TestEvaluableExpressionPrimaryExpr_EvalString(t *testing.T) {
 	}
 }
 
-func TestEvaluableExpressionStmt_EvalString(t *testing.T) {
+func TestEvaluableExpression_EvalString(t *testing.T) {
 	type fields struct {
 		stage       *evaluationNode
 		ChecksTypes bool
@@ -1700,7 +1900,7 @@ func TestEvaluableExpressionStmt_EvalString(t *testing.T) {
 	}
 }
 
-func TestEvaluableExpression_EvalString(t *testing.T) {
+func TestEvaluableExpressionStmt_EvalString(t *testing.T) {
 	type fields struct {
 		stage       *evaluationNode
 		ChecksTypes bool
