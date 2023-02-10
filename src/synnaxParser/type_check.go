@@ -61,10 +61,7 @@ func isInt64(value any) bool {
 // 加法，支持字符串和数字
 func additionTypeCheck(left any, right any) bool {
 
-	if isFloat64(left) && isFloat64(right) {
-		return true
-	}
-	if isInt64(left) && isInt64(right) {
+	if (isFloat64(left) || isInt64(left)) && (isFloat64(right) || isInt64(right)) {
 		return true
 	}
 	if isString(left) && isString(right) {
@@ -76,10 +73,7 @@ func additionTypeCheck(left any, right any) bool {
 // 比较操作类型检测
 func comparatorTypeCheck(left any, right any) bool {
 
-	if isFloat64(left) && isFloat64(right) {
-		return true
-	}
-	if isInt64(left) && isInt64(right) {
+	if (isFloat64(left) || isInt64(left)) && (isFloat64(right) || isInt64(right)) {
 		return true
 	}
 	if isString(left) && isString(right) {

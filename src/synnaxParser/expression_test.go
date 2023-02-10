@@ -1950,10 +1950,14 @@ func TestEvaluableExpressionStmt_EvalString(t *testing.T) {
 				ChecksTypes: true,
 			},
 			args: args{
-				expression: "true",
-				parameters: MapParameters{},
+				expression: "((a * (b + c ) / 3.0 + 354) < 80 ) && true",
+				parameters: MapParameters{
+					"a": 1,
+					"b": 43,
+					"c": 0,
+				},
 			},
-			want:    bool(true),
+			want:    bool(false),
 			wantErr: false,
 		},
 		{
