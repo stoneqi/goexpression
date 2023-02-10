@@ -345,7 +345,14 @@ func indexOperator(left any, right any, parameters Parameters) (any, error) {
 		}
 		value := leftValue.Index(int(indexFloat))
 		if value.IsValid() {
-			return value.Interface(), nil
+			valueRet := value.Interface()
+			if isInt64(valueRet) {
+				return castToInt64(valueRet), nil
+			}
+			if isFloat64(valueRet) {
+				return castToFloat64(valueRet), nil
+			}
+			return valueRet, nil
 		} else {
 			return nil, errors.New("no found in array" + reflect.ValueOf(right).String())
 		}
@@ -395,6 +402,85 @@ func makeFunctionOperator(left any, right any, parameters Parameters) (any, erro
 	default:
 		return fun(right)
 	}
+}
+
+// 函数执行
+func makeFunction2Operator(left any, right any, parameters Parameters) (any, error) {
+	if left == nil {
+		return nil, errors.New("no Function")
+	}
+	if right == nil {
+		return nil, errors.New("no Parameters")
+	}
+
+	funValue := reflect.ValueOf(left)
+	funType := reflect.TypeOf(left)
+	if funType.Kind() != reflect.Func {
+		return nil, errors.New("no func type")
+	}
+	if funType.NumOut() == 0 {
+		return nil, errors.New("return param gt 2")
+	}
+	if funType.NumOut() > 2 {
+		return nil, errors.New("return param gt 2")
+	}
+	parametersValue, ok := right.([]any)
+	if !ok {
+		return nil, errors.New("parameters no array")
+	}
+	if funType.NumIn() != len(parametersValue) {
+		return nil, errors.New("parameters len no eq")
+	}
+
+	var params []reflect.Value
+	for i := 0; i < funType.NumIn(); i++ {
+		paramsType := reflect.TypeOf(parametersValue[i])
+		if !paramsType.AssignableTo(funType.In(i)) {
+			return nil, errors.New("parameters type no eq")
+		} else {
+			params = append(params, reflect.ValueOf(parametersValue[i]))
+		}
+	}
+
+	returned := funValue.Call(params)
+	retLength := len(returned)
+
+	if retLength == 0 {
+		return nil, errors.New("Method call '" + funValue.String() + "' did not return any values.")
+	}
+
+	valueRet := returned[0].Interface()
+	if isInt64(valueRet) {
+		valueRet = castToInt64(valueRet)
+	}
+	if isFloat64(valueRet) {
+		valueRet = castToFloat64(valueRet)
+	}
+
+	if retLength == 1 {
+		return valueRet, nil
+	}
+
+	if retLength == 2 {
+		errIface := returned[1].Interface()
+		err, validType := errIface.(error)
+		if validType && errIface != nil {
+			return valueRet, err
+		}
+		return valueRet, nil
+	}
+
+	return nil, errors.New("method call fail")
+
+	//if !ok {
+	//	return nil, errors.New("left is not func type")
+	//}
+	//switch right.(type) {
+	//case []any:
+	//	return fun(right.([]any)...)
+	//default:
+	//	return fun(right)
+	//}
 }
 
 //// 函数执行

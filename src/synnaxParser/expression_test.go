@@ -307,7 +307,7 @@ func TestEvaluableExpressionBasicLit_EvalString(t *testing.T) {
 				expression: "\"3423asvas%	6712你好\"",
 				parameters: MapParameters{},
 			},
-			want:    "3423asvas%	6712你好",
+			want: "3423asvas%	6712你好",
 			wantErr: false,
 		},
 		{
@@ -787,10 +787,10 @@ func TestEvaluableExpressionPrimaryExpr_EvalString(t *testing.T) {
 			args: args{
 				expression: "pass()",
 				parameters: MapParameters{
-					"pass": func(arguments ...any) (any, error) { return 3, nil },
+					"pass": func() (any, error) { return 3, nil },
 				},
 			},
-			want:    int(3),
+			want:    int64(3),
 			wantErr: false,
 		},
 		{
@@ -802,10 +802,10 @@ func TestEvaluableExpressionPrimaryExpr_EvalString(t *testing.T) {
 			args: args{
 				expression: "pass(1)",
 				parameters: MapParameters{
-					"pass": func(arguments ...any) (any, error) { return arguments[0], nil },
+					"pass": func(a int64) (any, error) { return a, nil },
 				},
 			},
-			want:    int64(3),
+			want:    int64(1),
 			wantErr: false,
 		},
 		{
@@ -817,7 +817,7 @@ func TestEvaluableExpressionPrimaryExpr_EvalString(t *testing.T) {
 			args: args{
 				expression: "sum(1,2)",
 				parameters: MapParameters{
-					"sum": func(arguments ...any) (any, error) { return arguments[0].(int64) + arguments[1].(int64), nil },
+					"sum": func(a int64, b int64) (any, error) { return a + b, nil },
 				},
 			},
 			want:    int64(3),
@@ -830,12 +830,12 @@ func TestEvaluableExpressionPrimaryExpr_EvalString(t *testing.T) {
 				ChecksTypes: true,
 			},
 			args: args{
-				expression: "sum(1, sum(2, 3), 2 + 2, true ? 4 : 5)",
+				expression: "sum(sum(1, sum(2, 3) ),true ? 4 : 5)",
 				parameters: MapParameters{
-					"sum": func(arguments ...any) (any, error) { return arguments[0].(int64) + arguments[1].(int64), nil },
+					"sum": func(a int64, b int64) (any, error) { return a + b, nil },
 				},
 			},
-			want:    int64(6),
+			want:    int64(10),
 			wantErr: false,
 		},
 		{

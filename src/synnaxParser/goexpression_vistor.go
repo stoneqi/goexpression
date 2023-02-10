@@ -275,7 +275,7 @@ func (ge *goExpreesionVisitor) VisitPrimaryExpr(ctx *parser.PrimaryExprContext) 
 		if ctx.Arguments() != nil {
 			node.Symbol = FUNCCALL
 			node.RightOperator = ctx.Arguments().Accept(ge).(*evaluationNode)
-			node.Operator = makeFunctionOperator
+			node.Operator = makeFunction2Operator
 		}
 		return node
 	}
