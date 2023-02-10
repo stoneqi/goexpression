@@ -1125,6 +1125,32 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "a+b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "\"aa\"+\"345\"",
+				parameters: MapParameters{},
+			},
+			want:    "aa345",
+			wantErr: false,
+		},
+		{
+			name: "a+b",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "3.2+3.3",
+				parameters: MapParameters{},
+			},
+			want:    float64(6.5),
+			wantErr: false,
+		},
+		{
 			name: "a-b",
 			fields: fields{
 				stage:       nil,
