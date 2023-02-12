@@ -80,7 +80,7 @@ func (ge *goExpreesionVisitor) VisitExpression(ctx *parser.ExpressionContext) an
 		}
 
 		rightNode := ctx.GetChildOfType(1, nil)
-		node.RightOperator = rightNode.Accept(ge).(*evaluationNode)
+		node.RightOperator = []*evaluationNode{rightNode.Accept(ge).(*evaluationNode)}
 
 	}
 
@@ -88,8 +88,9 @@ func (ge *goExpreesionVisitor) VisitExpression(ctx *parser.ExpressionContext) an
 		//oper, _ := ctx.GetChild(0).GetChild(1).(antlr.TerminalNode)
 		leftNode := ctx.GetChildOfType(0, nil)
 		node.LeftOperator = leftNode.Accept(ge).(*evaluationNode)
+
 		rightNode := ctx.GetChildOfType(2, nil)
-		node.RightOperator = rightNode.Accept(ge).(*evaluationNode)
+		node.RightOperator = []*evaluationNode{rightNode.Accept(ge).(*evaluationNode)}
 
 		if ctx.PLUS() != nil {
 			node.Symbol = PLUS
@@ -259,22 +260,24 @@ func (ge *goExpreesionVisitor) VisitPrimaryExpr(ctx *parser.PrimaryExprContext) 
 	if ctx.GetChildCount() == 2 {
 		node := newEvaluationNode()
 		node.RawString = ctx.GetText()
+
 		node.LeftOperator = ctx.PrimaryExpr().Accept(ge).(*evaluationNode)
+		//node.LeftOperator = ctx.PrimaryExpr().Accept(ge).(*evaluationNode)
 		if ctx.Index() != nil {
 			node.Symbol = INDEX
-			node.RightOperator = ctx.Index().Accept(ge).(*evaluationNode)
+			node.RightOperator = []*evaluationNode{ctx.Index().Accept(ge).(*evaluationNode)}
 			node.Operator = indexOperator
 			node.LeftTypeCheck = nil
 		}
 
 		if ctx.Slice_() != nil {
 			node.Symbol = SLICE
-			node.RightOperator = ctx.Slice_().Accept(ge).(*evaluationNode)
+			node.RightOperator = []*evaluationNode{ctx.Slice_().Accept(ge).(*evaluationNode)}
 			node.Operator = makeSliceOperator
 		}
 		if ctx.Arguments() != nil {
 			node.Symbol = FUNCCALL
-			node.RightOperator = ctx.Arguments().Accept(ge).(*evaluationNode)
+			node.RightOperator = []*evaluationNode{ctx.Arguments().Accept(ge).(*evaluationNode)}
 			node.Operator = makeFunction2Operator
 		}
 		return node
@@ -318,7 +321,7 @@ func (ge *goExpreesionVisitor) VisitOperand(ctx *parser.OperandContext) any {
 func (ge *goExpreesionVisitor) VisitOperandName(ctx *parser.OperandNameContext) any {
 	node := newEvaluationNode()
 	node.RawString = ctx.GetText()
-	node.Symbol = LITERAL
+	node.Symbol = VALUE
 	node.RawString = ctx.Identifier().GetText()
 	node.Operator = makeParameterOperator(ctx.Identifier().GetText())
 	return node
@@ -338,7 +341,8 @@ func (ge *goExpreesionVisitor) VisitExpressionColon(ctx *parser.ExpressionColonC
 		expList = append(expList, context.Accept(ge).(*evaluationNode))
 	}
 	node.Symbol = EXPRESSIONCOLON
-	node.Operator = makeMultiExpressionOperator(expList)
+	node.RightOperator = expList
+	node.Operator = rightOperator
 	return node
 }
 
@@ -421,7 +425,8 @@ func (ge *goExpreesionVisitor) VisitExpressionList(ctx *parser.ExpressionListCon
 	}
 
 	node.Symbol = EXPRESSIONLIST
-	node.Operator = makeMultiExpressionOperator(expList)
+	node.RightOperator = expList
+	node.Operator = rightOperator
 	return node
 }
 

@@ -6,6 +6,7 @@ type OperatorSymbol uint8
 // Node ops.
 const (
 	OXXX OperatorSymbol = iota
+	VALUE
 	LITERAL
 	PLUS
 	MINUS

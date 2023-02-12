@@ -1,6 +1,9 @@
 package parserSecond
 
-import "regexp"
+import (
+	"reflect"
+	"regexp"
+)
 
 // 是字符串
 func isString(value any) bool {
@@ -56,6 +59,12 @@ func isInt64(value any) bool {
 		return true
 	}
 	return false
+}
+
+// 可比较
+func isComparable(value interface{}) bool {
+	valueType := reflect.TypeOf(value)
+	return valueType.Comparable()
 }
 
 // 加法，支持字符串和数字

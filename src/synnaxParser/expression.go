@@ -16,6 +16,7 @@ type EvaluableExpression struct {
 
 func (ee *EvaluableExpression) EvalString(expression string, parameters Parameters) (any, error) {
 	ee.stage, _ = VisitorParserString(expression)
+	ee.stage = elideLiterals(ee.stage)
 	return ee.evaluateStage(ee.stage, parameters)
 }
 
@@ -59,9 +60,18 @@ func (ee *EvaluableExpression) evaluateStage(stage *evaluationNode, parameters P
 	}
 
 	if right != shortCircuitHolder && stage.RightOperator != nil {
-		right, err = ee.evaluateStage(stage.RightOperator, parameters)
-		if err != nil {
-			return nil, err
+		var rightValue []interface{}
+		for _, node := range stage.RightOperator {
+			rightTemp, err := ee.evaluateStage(node, parameters)
+			if err != nil {
+				return nil, err
+			}
+			rightValue = append(rightValue, rightTemp)
+		}
+		if len(rightValue) == 1 {
+			right = rightValue[0]
+		} else {
+			right = rightValue
 		}
 	}
 

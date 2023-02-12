@@ -307,7 +307,7 @@ func TestEvaluableExpressionBasicLit_EvalString(t *testing.T) {
 				expression: "\"3423asvas%	6712你好\"",
 				parameters: MapParameters{},
 			},
-			want: "3423asvas%	6712你好",
+			want:    "3423asvas%	6712你好",
 			wantErr: false,
 		},
 		{
@@ -569,6 +569,19 @@ func TestEvaluableExpressionOperand_EvalString(t *testing.T) {
 				parameters: MapParameters{},
 			},
 			want:    []interface{}{int64(100), int64(200), int64(300)},
+			wantErr: false,
+		},
+		{
+			name: "L_CURLY (expressionList)? R_CURLY",
+			fields: fields{
+				stage:       nil,
+				ChecksTypes: true,
+			},
+			args: args{
+				expression: "{100,{100,200},300}",
+				parameters: MapParameters{},
+			},
+			want:    []interface{}{int64(100), []interface{}{int64(100), int64(200)}, int64(300)},
 			wantErr: false,
 		},
 		{

@@ -323,16 +323,7 @@ func indexOperator(left any, right any, parameters Parameters) (any, error) {
 
 	leftValue := reflect.ValueOf(left)
 
-	if leftValue.Kind() == reflect.Map {
-		value := leftValue.MapIndex(reflect.ValueOf(right))
-		if value.IsValid() {
-			return value.Interface(), nil
-		} else {
-			return nil, errors.New("no found in map" + reflect.ValueOf(right).String())
-		}
-	}
-
-	if leftValue.Kind() == reflect.Array || leftValue.Kind() == reflect.Slice {
+	if leftValue.Kind() == reflect.Map || leftValue.Kind() == reflect.Array || leftValue.Kind() == reflect.Slice || leftValue.Kind() == reflect.String {
 		var indexFloat int64 = -1
 		if isInt64(right) {
 			indexFloat = castToInt64(right)
@@ -341,9 +332,14 @@ func indexOperator(left any, right any, parameters Parameters) (any, error) {
 			indexFloat = int64(castToFloat64(right))
 		}
 		if indexFloat < 0 || indexFloat >= int64(leftValue.Len()) {
-			return nil, errors.New("index no int in array")
+			return nil, errors.New("map index out of range")
 		}
-		value := leftValue.Index(int(indexFloat))
+		var value reflect.Value
+		if leftValue.Kind() == reflect.Map {
+			value = leftValue.MapIndex(reflect.ValueOf(right))
+		} else {
+			value = leftValue.Index(int(indexFloat))
+		}
 		if value.IsValid() {
 			valueRet := value.Interface()
 			if isInt64(valueRet) {
@@ -354,11 +350,10 @@ func indexOperator(left any, right any, parameters Parameters) (any, error) {
 			}
 			return valueRet, nil
 		} else {
-			return nil, errors.New("no found in array" + reflect.ValueOf(right).String())
+			return nil, errors.New(reflect.ValueOf(right).String() + "index out of range")
 		}
 	}
-
-	return nil, errors.New("lefRight is no array or slice or map")
+	return nil, errors.New("lefRight is no array or slice or map or string")
 
 }
 
@@ -426,7 +421,7 @@ func makeFunction2Operator(left any, right any, parameters Parameters) (any, err
 	}
 	parametersValue, ok := right.([]any)
 	if !ok {
-		return nil, errors.New("parameters no array")
+		parametersValue = append(parametersValue, right)
 	}
 	if funType.NumIn() != len(parametersValue) {
 		return nil, errors.New("parameters len no eq")
@@ -538,73 +533,73 @@ func makeSliceOperator(left any, right any, parameters Parameters) (any, error) 
 }
 
 // 函数参数
-func makeMultiExpressionOperator(expression []*evaluationNode) EvaluationOperator {
-	return func(left any, right any, parameters Parameters) (any, error) {
-		res := make([]any, 0, len(expression))
-		for _, node := range expression {
-			stage, err := evaluateStage(node, parameters)
-			if err != nil {
-				return nil, err
-			}
-			res = append(res, stage)
-		}
-		return res, nil
-	}
-}
+//func makeMultiExpressionOperator(expression []*evaluationNode) EvaluationOperator {
+//	return func(left any, right any, parameters Parameters) (any, error) {
+//		res := make([]any, 0, len(expression))
+//		for _, node := range expression {
+//			stage, err := evaluateStage(node, parameters)
+//			if err != nil {
+//				return nil, err
+//			}
+//			res = append(res, stage)
+//		}
+//		return res, nil
+//	}
+//}
 
-func evaluateStage(stage *evaluationNode, parameters Parameters) (any, error) {
-
-	var left, right any
-	var err error
-
-	if stage.LeftOperator != nil {
-		left, err = evaluateStage(stage.LeftOperator, parameters)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if stage.isShortCircuitable() {
-		switch stage.Symbol {
-		case LOGICAL_AND:
-			if left == false {
-				return false, nil
-			}
-		case LOGICAL_OR:
-			if left == true {
-				return true, nil
-			}
-		}
-	}
-
-	if right != shortCircuitHolder && stage.RightOperator != nil {
-		right, err = evaluateStage(stage.RightOperator, parameters)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if stage.TypeCheck == nil {
-
-		err = typeCheck(stage.LeftTypeCheck, left, stage.Symbol, stage.TypeErrorFormat)
-		if err != nil {
-			return nil, err
-		}
-
-		err = typeCheck(stage.RightTypeCheck, right, stage.Symbol, stage.TypeErrorFormat)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		// special case where the type check needs to know both sides to determine if the Operator can handle it
-		if !stage.TypeCheck(left, right) {
-			errorMsg := fmt.Sprintf(stage.TypeErrorFormat, left, stage.Symbol.String())
-			return nil, errors.New(errorMsg)
-		}
-	}
-
-	return stage.Operator(left, right, parameters)
-}
+//func evaluateStage(stage *evaluationNode, parameters Parameters) (any, error) {
+//
+//	var left, right any
+//	var err error
+//
+//	if stage.LeftOperator != nil {
+//		left, err = evaluateStage(stage.LeftOperator, parameters)
+//		if err != nil {
+//			return nil, err
+//		}
+//	}
+//
+//	if stage.isShortCircuitable() {
+//		switch stage.Symbol {
+//		case LOGICAL_AND:
+//			if left == false {
+//				return false, nil
+//			}
+//		case LOGICAL_OR:
+//			if left == true {
+//				return true, nil
+//			}
+//		}
+//	}
+//
+//	if right != shortCircuitHolder && stage.RightOperator != nil {
+//		right, err = evaluateStage(stage.RightOperator, parameters)
+//		if err != nil {
+//			return nil, err
+//		}
+//	}
+//
+//	if stage.TypeCheck == nil {
+//
+//		err = typeCheck(stage.LeftTypeCheck, left, stage.Symbol, stage.TypeErrorFormat)
+//		if err != nil {
+//			return nil, err
+//		}
+//
+//		err = typeCheck(stage.RightTypeCheck, right, stage.Symbol, stage.TypeErrorFormat)
+//		if err != nil {
+//			return nil, err
+//		}
+//	} else {
+//		// special case where the type check needs to know both sides to determine if the Operator can handle it
+//		if !stage.TypeCheck(left, right) {
+//			errorMsg := fmt.Sprintf(stage.TypeErrorFormat, left, stage.Symbol.String())
+//			return nil, errors.New(errorMsg)
+//		}
+//	}
+//
+//	return stage.Operator(left, right, parameters)
+//}
 
 // 类型转换
 func typeConvertParam(p reflect.Value, t reflect.Type) (ret reflect.Value, err error) {

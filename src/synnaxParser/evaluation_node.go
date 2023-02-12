@@ -22,7 +22,8 @@ func (sctc *StageCombinedTypeCheck) MarshalJSON() ([]byte, error) {
 type evaluationNode struct {
 	Symbol OperatorSymbol
 
-	LeftOperator, RightOperator *evaluationNode
+	LeftOperator  *evaluationNode
+	RightOperator []*evaluationNode
 
 	// the operation that will be used to evaluate this stage (such as adding [left] to [right] and return the result)
 	Operator EvaluationOperator
