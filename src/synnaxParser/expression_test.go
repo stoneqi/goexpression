@@ -1957,7 +1957,7 @@ func TestEvaluableExpressionStmt_EvalString(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "a",
+			name: "ExpressionStmt",
 			fields: fields{
 				stage:       nil,
 				ChecksTypes: true,
@@ -1974,14 +1974,16 @@ func TestEvaluableExpressionStmt_EvalString(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "a",
+			name: "ExpressionStmt",
 			fields: fields{
 				stage:       nil,
 				ChecksTypes: true,
 			},
 			args: args{
-				expression: "true",
-				parameters: MapParameters{},
+				expression: "{1,a}[1] + ({1,2,3,{4,5,2}}[3][2]+45) / 34",
+				parameters: MapParameters{
+					"a": 34,
+				},
 			},
 			want:    bool(true),
 			wantErr: false,
