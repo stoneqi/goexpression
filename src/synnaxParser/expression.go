@@ -3,24 +3,106 @@ package parserSecond
 import (
 	"errors"
 	"fmt"
+	"github.com/stoneqi/goexpression"
+	"sync"
 )
 
 const shortCircuitHolder int = -1
 
 type EvaluableExpression struct {
-	stage       *evaluationNode
-	ChecksTypes bool
-	recordStep  []string
-	IsDebug     bool
+	singleExpr   *evaluationNode
+	singleString string
+	ChecksTypes  bool
+	recordStep   []string
+	IsDebug      bool
+	expr         sync.Map
+	exprString   sync.Map
 }
 
-func (ee *EvaluableExpression) EvalString(expression string, parameters Parameters) (any, error) {
-	ee.stage, _ = VisitorParserString(expression)
-	ee.stage = elideLiterals(ee.stage)
-	return ee.evaluateStage(ee.stage, parameters)
+func NewEvaluableExpression(stage *evaluationNode) *EvaluableExpression {
+	return &EvaluableExpression{
+		singleExpr: stage}
 }
 
-func (ee *EvaluableExpression) evaluateStage(stage *evaluationNode, parameters Parameters) (any, error) {
+func (ee *EvaluableExpression) AddExpr(key any, expr string) error {
+	stageTemp, err := VisitorParserString(expr)
+	if err != nil {
+		return err
+	}
+	stageTemp = elideLiterals(stageTemp)
+	ee.expr.Store(key, stageTemp)
+	ee.exprString.Store(key, expr)
+	return nil
+}
+
+func (ee *EvaluableExpression) EvalAllExpr(parameters goexpression.Parameters) (map[any]any, map[any]error) {
+	ret := make(map[any]any, 0)
+	errs := make(map[any]error, 0)
+	ee.expr.Range(func(key, value any) bool {
+		stage, err := ee.evaluateStage(value.(*evaluationNode), parameters)
+		if err != nil {
+			errs[key] = err
+		} else {
+			ret[key] = stage
+		}
+		return true
+	})
+	return ret, errs
+}
+
+func (ee *EvaluableExpression) EvaluateAllExpr(parameters map[string]any) (map[any]any, map[any]error) {
+	return ee.EvalAllExpr(MapParameters(parameters))
+}
+
+func (ee *EvaluableExpression) EvaluateExprByKey(key any, parameters map[string]any) (any, error) {
+	return ee.EvalExprByKey(key, MapParameters(parameters))
+}
+
+func (ee *EvaluableExpression) EvalExprByKey(key any, parameters goexpression.Parameters) (any, error) {
+	if expr, ok := ee.expr.Load(key); ok {
+		tempExpr := expr.(*evaluationNode)
+		return ee.evaluateStage(tempExpr, parameters)
+	} else {
+		return nil, errors.New("no found expr")
+	}
+}
+
+func (ee *EvaluableExpression) AddSingleExpr(expr string) error {
+	var err error
+	ee.singleExpr, err = VisitorParserString(expr)
+	if err != nil {
+		return err
+	}
+	ee.singleExpr = elideLiterals(ee.singleExpr)
+	return nil
+}
+
+func (ee *EvaluableExpression) EvalSingleString(parameters goexpression.Parameters) (any, error) {
+	return ee.evaluateStage(ee.singleExpr, parameters)
+}
+func (ee *EvaluableExpression) EvaluateSingleString(parameters map[string]any) (any, error) {
+	return ee.evaluateStage(ee.singleExpr, MapParameters(parameters))
+}
+func (ee *EvaluableExpression) String(key any) (string, error) {
+	if key != nil {
+		if value, ok := ee.exprString.Load(key); ok {
+			return value.(string), nil
+		}
+		return "", errors.New("no found key")
+	}
+	if ee.singleString != "" {
+		return "", errors.New("no found key")
+	}
+	return ee.singleString, nil
+}
+
+func (ee *EvaluableExpression) evalString(expression string, parameters goexpression.Parameters) (any, error) {
+	ee.singleExpr, _ = VisitorParserString(expression)
+	ee.singleExpr = elideLiterals(ee.singleExpr)
+	return ee.evaluateStage(ee.singleExpr, parameters)
+}
+
+func (ee *EvaluableExpression) evaluateStage(stage *evaluationNode, parameters goexpression.Parameters) (any, error) {
 
 	var left, right any
 	var err error

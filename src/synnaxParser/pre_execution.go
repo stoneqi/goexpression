@@ -17,9 +17,9 @@ func elideLiterals(root *evaluationNode) *evaluationNode {
 }
 
 /*
-Elides a specific stage, if possible.
-Returns the unmodified [root] stage if it cannot or should not be elided.
-Otherwise, returns a new stage representing the condensed value from the elided stages.
+Elides a specific singleExpr, if possible.
+Returns the unmodified [root] singleExpr if it cannot or should not be elided.
+Otherwise, returns a new singleExpr representing the condensed value from the elided stages.
 */
 func elideStage(root *evaluationNode) *evaluationNode {
 
@@ -89,7 +89,7 @@ func elideStage(root *evaluationNode) *evaluationNode {
 		return root
 	}
 
-	// pre-calculate, and return a new stage representing the result.
+	// pre-calculate, and return a new singleExpr representing the result.
 	result, err = root.Operator(leftValue, rightValue, nil)
 	if err != nil {
 		return root

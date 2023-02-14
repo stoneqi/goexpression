@@ -1,7 +1,9 @@
 // Package main provides ...
 package parserSecond
 
-type EvaluationOperator func(left any, right any, parameters Parameters) (any, error)
+import "github.com/stoneqi/goexpression"
+
+type EvaluationOperator func(left any, right any, parameters goexpression.Parameters) (any, error)
 
 func (eo *EvaluationOperator) MarshalJSON() ([]byte, error) {
 	return []byte("\"EvaluationOperator\""), nil
@@ -25,10 +27,10 @@ type evaluationNode struct {
 	LeftOperator  *evaluationNode
 	RightOperator []*evaluationNode
 
-	// the operation that will be used to evaluate this stage (such as adding [left] to [right] and return the result)
+	// the operation that will be used to evaluate this singleExpr (such as adding [left] to [right] and return the result)
 	Operator EvaluationOperator
 
-	// ensures that both left and right values are appropriate for this stage. Returns an error if they aren't operable.
+	// ensures that both left and right values are appropriate for this singleExpr. Returns an error if they aren't operable.
 	LeftTypeCheck  StageTypeCheck
 	RightTypeCheck StageTypeCheck
 
