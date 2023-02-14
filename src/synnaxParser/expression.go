@@ -24,7 +24,15 @@ func NewEvaluableExpression(stage *evaluationNode) *EvaluableExpression {
 		singleExpr: stage}
 }
 
-func (ee *EvaluableExpression) AddExpr(key any, expr string) error {
+func (ee *EvaluableExpression) AddExpr(key any, expr string) (err error) {
+	defer func() {
+		if errRec := recover(); errRec != nil {
+			err = errors.New(fmt.Sprintf("panic: %+v", errRec))
+			return
+		}
+		err = errors.New("panic: no err info")
+		return
+	}()
 	stageTemp, err := VisitorParserString(expr)
 	if err != nil {
 		return err
@@ -67,8 +75,15 @@ func (ee *EvaluableExpression) EvalExprByKey(key any, parameters goexpression.Pa
 	}
 }
 
-func (ee *EvaluableExpression) AddSingleExpr(expr string) error {
-	var err error
+func (ee *EvaluableExpression) AddSingleExpr(expr string) (err error) {
+	defer func() {
+		if errRec := recover(); errRec != nil {
+			err = errors.New(fmt.Sprintf("panic: %+v", errRec))
+			return
+		}
+		err = errors.New("panic: no err info")
+		return
+	}()
 	ee.singleExpr, err = VisitorParserString(expr)
 	if err != nil {
 		return err
@@ -102,10 +117,17 @@ func (ee *EvaluableExpression) evalString(expression string, parameters goexpres
 	return ee.evaluateStage(ee.singleExpr, parameters)
 }
 
-func (ee *EvaluableExpression) evaluateStage(stage *evaluationNode, parameters goexpression.Parameters) (any, error) {
+func (ee *EvaluableExpression) evaluateStage(stage *evaluationNode, parameters goexpression.Parameters) (ret any, err error) {
 
+	defer func() {
+		if errRec := recover(); errRec != nil {
+			err = errors.New(fmt.Sprintf("panic: %+v", errRec))
+			return
+		}
+		err = errors.New("panic: no err info")
+		return
+	}()
 	var left, right any
-	var err error
 
 	if stage.LeftOperator != nil {
 		left, err = ee.evaluateStage(stage.LeftOperator, parameters)
@@ -179,13 +201,13 @@ func (ee *EvaluableExpression) evaluateStage(stage *evaluationNode, parameters g
 	}
 
 	if ee.IsDebug {
-		value, err := stage.Operator(left, right, parameters)
+		ret, err := stage.Operator(left, right, parameters)
 		if err != nil {
 			ee.recordStep = append(ee.recordStep, stage.RawString)
 		} else {
-			ee.recordStep = append(ee.recordStep, fmt.Sprintf("%s:%+v", stage.RawString, value))
+			ee.recordStep = append(ee.recordStep, fmt.Sprintf("%s:%+v", stage.RawString, ret))
 		}
-		return value, err
+		return ret, err
 	} else {
 		return stage.Operator(left, right, parameters)
 	}
