@@ -2061,6 +2061,34 @@ func TestEvaluableExpressionContext_evalStringTest2(t *testing.T) {
 			want:    int64(234),
 			wantErr: false,
 		},
+		{
+			name: "a+b",
+			args: args{
+				expression: "3 + 5 + a[2] ",
+				parameters: MapParameters{
+					"a": []int{4, 3, 5},
+				},
+				parameters2: MapParameters{
+					//"a": []int{4, 3, 5},
+				},
+			},
+			want:    int64(13),
+			wantErr: false,
+		},
+		{
+			name: "a+b",
+			args: args{
+				expression: "3 + 5 + a() ",
+				parameters: MapParameters{
+					"a": func() int { return 5 },
+				},
+				parameters2: MapParameters{
+					//"a": []int{4, 3, 5},
+				},
+			},
+			want:    int64(13),
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
