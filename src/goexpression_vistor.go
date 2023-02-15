@@ -1,6 +1,8 @@
-package parserSecond
+package src
 
 import (
+	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -9,11 +11,14 @@ import (
 )
 
 type goExpreesionVisitor struct {
-	root *evaluationNode
+	parameters Parameters
+	root       *evaluationNode
 }
 
-func newGoExpreesionVisitor() *goExpreesionVisitor {
-	return &goExpreesionVisitor{}
+func newGoExpreesionVisitor(parameters Parameters) *goExpreesionVisitor {
+	return &goExpreesionVisitor{
+		parameters: parameters,
+	}
 }
 
 func (ge *goExpreesionVisitor) Visit(tree antlr.ParseTree) any {
@@ -321,9 +326,18 @@ func (ge *goExpreesionVisitor) VisitOperand(ctx *parser.OperandContext) any {
 func (ge *goExpreesionVisitor) VisitOperandName(ctx *parser.OperandNameContext) any {
 	node := newEvaluationNode()
 	node.RawString = ctx.GetText()
-	node.Symbol = VALUE
 	node.RawString = ctx.Identifier().GetText()
+
+	if ge.parameters != nil {
+		if value, err := ge.parameters.Get(node.RawString); err == nil {
+			node.Symbol = LITERAL
+			node.Operator = makeLiteralOperator(value)
+			return node
+		}
+	}
+	node.Symbol = VALUE
 	node.Operator = makeParameterOperator(ctx.Identifier().GetText())
+
 	return node
 }
 
@@ -449,10 +463,20 @@ func (ge *goExpreesionVisitor) VisitEos(ctx *parser.EosContext) any {
 func (ge *goExpreesionVisitor) VisitIdentifier(ctx *parser.IdentifierContext) any {
 	node := newEvaluationNode()
 	node.RawString = ctx.GetText()
-	node.Symbol = LITERAL
 	if ctx.IDENTIFIER() != nil {
 		node.Operator = makeParameterOperator(ctx.IDENTIFIER().GetText())
 	}
+
+	if ge.parameters != nil {
+		if value, err := ge.parameters.Get(node.RawString); err == nil {
+			node.Symbol = LITERAL
+			node.Operator = makeLiteralOperator(value)
+			return node
+		}
+	}
+	node.Symbol = VALUE
+	node.Operator = makeParameterOperator(ctx.IDENTIFIER().GetText())
+
 	return node
 }
 
@@ -472,16 +496,22 @@ func (ge *goExpreesionVisitor) VisitString_(ctx *parser.String_Context) any {
 	return node
 }
 
-func VisitorParserString(expression string) (*evaluationNode, error) {
+func VisitorParserString(ctx *EvaluableExpressionContext, expression string) (node *evaluationNode, err error) {
+	defer func() {
+		if errRec := recover(); errRec != nil {
+			err = errors.New(fmt.Sprintf("panic: %+v", errRec))
+			return
+		}
+	}()
 	lexer := parser.NewgoexpressionLexer(antlr.NewInputStream(expression))
 	stream := antlr.NewCommonTokenStream(lexer, 0)
 	p := parser.NewgoexpressionParser(stream)
 	p.AddErrorListener(antlr.NewDiagnosticErrorListener(true))
 	p.BuildParseTrees = true
-	visitor := newGoExpreesionVisitor()
+	visitor := newGoExpreesionVisitor(ctx.parameters)
 	tree := p.ExpressionStmt()
 	res := tree.Accept(visitor)
 
-	node := res.(*evaluationNode)
-	return node, nil
+	node = res.(*evaluationNode)
+	return
 }

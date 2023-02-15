@@ -1,4 +1,4 @@
-package parserSecond
+package src
 
 import "errors"
 

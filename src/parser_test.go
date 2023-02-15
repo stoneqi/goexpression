@@ -1,5 +1,5 @@
 // Package main provides ...
-package parserSecond
+package src
 
 import (
 	"testing"

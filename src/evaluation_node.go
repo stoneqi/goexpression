@@ -1,9 +1,7 @@
 // Package main provides ...
-package parserSecond
+package src
 
-import "github.com/stoneqi/goexpression"
-
-type EvaluationOperator func(left any, right any, parameters goexpression.Parameters) (any, error)
+type EvaluationOperator func(left any, right any, parameters Parameters) (any, error)
 
 func (eo *EvaluationOperator) MarshalJSON() ([]byte, error) {
 	return []byte("\"EvaluationOperator\""), nil

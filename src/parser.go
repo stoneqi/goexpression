@@ -1,5 +1,5 @@
 // Package main provides ...
-package parserSecond
+package src
 
 import (
 	"github.com/stoneqi/goexpression/src/parser"

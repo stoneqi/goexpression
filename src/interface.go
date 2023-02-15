@@ -1,8 +1,10 @@
 // Package goexpression provides ...
-package goexpression
+package src
 
 type GoExpression interface {
 	AddExpr(key any, expr string) error
+	AddExprWithParameters(key any, expr string, parameters Parameters) error
+	AddExprWithMap(key any, expr string, parameters map[string]any) error
 	EvalAllExpr(parameters Parameters) (map[any]any, map[any]error)
 	EvalExprByKey(key any, parameters Parameters) (any, error)
 	EvaluateAllExpr(parameters map[string]any) (map[any]any, map[any]error)
@@ -15,4 +17,8 @@ type GoExpression interface {
 
 type Parameters interface {
 	Get(name string) (any, error)
+}
+
+func NewGoExpression() GoExpression {
+	return NewEvaluableExpression()
 }

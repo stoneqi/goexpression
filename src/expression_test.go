@@ -1,7 +1,6 @@
-package parserSecond
+package src
 
 import (
-	"github.com/stoneqi/goexpression"
 	"math"
 	"reflect"
 	"strings"
@@ -16,7 +15,7 @@ func TestEvaluableExpressionBasicLit_EvalString(t *testing.T) {
 	}
 	type args struct {
 		expression string
-		parameters goexpression.Parameters
+		parameters Parameters
 	}
 	tests := []struct {
 		name    string
@@ -340,19 +339,19 @@ func TestEvaluableExpressionBasicLit_EvalString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ee := &EvaluableExpression{
+			ee := &EvaluableExpressionContext{
 				singleExpr:  tt.fields.stage,
 				ChecksTypes: tt.fields.ChecksTypes,
 				IsDebug:     true,
 			}
-			got, err := ee.evalString(tt.args.expression, tt.args.parameters)
+			got, err := ee.evalStringTest(tt.args.expression, tt.args.parameters)
 			t.Logf("%s; got:%+v; type:%+v", strings.Join(ee.recordStep, "; "), got, reflect.TypeOf(got))
 			if (err != nil) != tt.wantErr {
-				t.Errorf("evalString() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("evalStringTest() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("evalString() got = %+v, want %+v", got, tt.want)
+				t.Errorf("evalStringTest() got = %+v, want %+v", got, tt.want)
 			}
 		})
 	}
@@ -366,7 +365,7 @@ func TestEvaluableExpressionOperandName_EvalString(t *testing.T) {
 	}
 	type args struct {
 		expression string
-		parameters goexpression.Parameters
+		parameters Parameters
 	}
 	tests := []struct {
 		name    string
@@ -472,19 +471,19 @@ func TestEvaluableExpressionOperandName_EvalString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ee := &EvaluableExpression{
+			ee := &EvaluableExpressionContext{
 				singleExpr:  tt.fields.stage,
 				ChecksTypes: tt.fields.ChecksTypes,
 				IsDebug:     true,
 			}
-			got, err := ee.evalString(tt.args.expression, tt.args.parameters)
+			got, err := ee.evalStringTest(tt.args.expression, tt.args.parameters)
 			t.Logf("%s; got:%+v; type:%+v", strings.Join(ee.recordStep, "; "), got, reflect.TypeOf(got))
 			if (err != nil) != tt.wantErr {
-				t.Errorf("evalString() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("evalStringTest() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("evalString() got = %+v, want %+v", got, tt.want)
+				t.Errorf("evalStringTest() got = %+v, want %+v", got, tt.want)
 			}
 		})
 	}
@@ -498,7 +497,7 @@ func TestEvaluableExpressionOperand_EvalString(t *testing.T) {
 	}
 	type args struct {
 		expression string
-		parameters goexpression.Parameters
+		parameters Parameters
 	}
 	tests := []struct {
 		name    string
@@ -614,19 +613,19 @@ func TestEvaluableExpressionOperand_EvalString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ee := &EvaluableExpression{
+			ee := &EvaluableExpressionContext{
 				singleExpr:  tt.fields.stage,
 				ChecksTypes: tt.fields.ChecksTypes,
 				IsDebug:     true,
 			}
-			got, err := ee.evalString(tt.args.expression, tt.args.parameters)
+			got, err := ee.evalStringTest(tt.args.expression, tt.args.parameters)
 			t.Logf("%s; got:%+v; type:%+v", strings.Join(ee.recordStep, "; "), got, reflect.TypeOf(got))
 			if (err != nil) != tt.wantErr {
-				t.Errorf("evalString() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("evalStringTest() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("evalString() got = %+v, want %+v", got, tt.want)
+				t.Errorf("evalStringTest() got = %+v, want %+v", got, tt.want)
 			}
 		})
 	}
@@ -640,7 +639,7 @@ func TestEvaluableExpressionPrimaryExpr_EvalString(t *testing.T) {
 	}
 	type args struct {
 		expression string
-		parameters goexpression.Parameters
+		parameters Parameters
 	}
 	tests := []struct {
 		name    string
@@ -895,19 +894,19 @@ func TestEvaluableExpressionPrimaryExpr_EvalString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ee := &EvaluableExpression{
+			ee := &EvaluableExpressionContext{
 				singleExpr:  tt.fields.stage,
 				ChecksTypes: tt.fields.ChecksTypes,
 				IsDebug:     true,
 			}
-			got, err := ee.evalString(tt.args.expression, tt.args.parameters)
+			got, err := ee.evalStringTest(tt.args.expression, tt.args.parameters)
 			t.Logf("%s; got:%+v; type:%+v", strings.Join(ee.recordStep, "; "), got, reflect.TypeOf(got))
 			if (err != nil) != tt.wantErr {
-				t.Errorf("evalString() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("evalStringTest() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("evalString() got = %+v, want %+v", got, tt.want)
+				t.Errorf("evalStringTest() got = %+v, want %+v", got, tt.want)
 			}
 		})
 	}
@@ -921,7 +920,7 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 	}
 	type args struct {
 		expression string
-		parameters goexpression.Parameters
+		parameters Parameters
 	}
 	tests := []struct {
 		name    string
@@ -1922,19 +1921,19 @@ func TestEvaluableExpression_EvalString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ee := &EvaluableExpression{
+			ee := &EvaluableExpressionContext{
 				singleExpr:  tt.fields.stage,
 				ChecksTypes: tt.fields.ChecksTypes,
 				IsDebug:     true,
 			}
-			got, err := ee.evalString(tt.args.expression, tt.args.parameters)
+			got, err := ee.evalStringTest(tt.args.expression, tt.args.parameters)
 			t.Logf("%s; got:%+v; type:%+v", strings.Join(ee.recordStep, "; "), got, reflect.TypeOf(got))
 			if (err != nil) != tt.wantErr {
-				t.Errorf("evalString() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("evalStringTest() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("evalString() got = %+v, want %+v", got, tt.want)
+				t.Errorf("evalStringTest() got = %+v, want %+v", got, tt.want)
 			}
 		})
 	}
@@ -1948,7 +1947,7 @@ func TestEvaluableExpressionStmt_EvalString(t *testing.T) {
 	}
 	type args struct {
 		expression string
-		parameters goexpression.Parameters
+		parameters Parameters
 	}
 	tests := []struct {
 		name    string
@@ -2005,19 +2004,77 @@ func TestEvaluableExpressionStmt_EvalString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ee := &EvaluableExpression{
+			ee := &EvaluableExpressionContext{
 				singleExpr:  tt.fields.stage,
 				ChecksTypes: tt.fields.ChecksTypes,
 				IsDebug:     true,
 			}
-			got, err := ee.evalString(tt.args.expression, tt.args.parameters)
+			got, err := ee.evalStringTest(tt.args.expression, tt.args.parameters)
 			t.Logf("%s; got:%+v; type:%+v", strings.Join(ee.recordStep, "; "), got, reflect.TypeOf(got))
 			if (err != nil) != tt.wantErr {
-				t.Errorf("evalString() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("evalStringTest() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("evalString() got = %+v, want %+v", got, tt.want)
+				t.Errorf("evalStringTest() got = %+v, want %+v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestEvaluableExpressionContext_evalStringTest2(t *testing.T) {
+
+	type args struct {
+		expression  string
+		parameters  Parameters
+		parameters2 Parameters
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    any
+		wantErr bool
+	}{
+		{
+			name: "a",
+			args: args{
+				expression: "a",
+				parameters: MapParameters{
+					"a": 1,
+				},
+				parameters2: MapParameters{},
+			},
+			want:    int64(1),
+			wantErr: false,
+		},
+		{
+			name: "a",
+			args: args{
+				expression: "a.B",
+				parameters: MapParameters{
+					"a": struct {
+						B int
+					}{B: 234},
+				},
+				parameters2: MapParameters{},
+			},
+			want:    int64(234),
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ee := &EvaluableExpressionContext{
+				IsDebug: true,
+			}
+			got, err := ee.evalStringTest2(tt.args.expression, tt.args.parameters, tt.args.parameters2)
+			t.Logf("%s; got:%+v; type:%+v", strings.Join(ee.recordStep, "; "), got, reflect.TypeOf(got))
+			if (err != nil) != tt.wantErr {
+				t.Errorf("evalStringTest() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("evalStringTest() got = %+v, want %+v", got, tt.want)
 			}
 		})
 	}

@@ -1,9 +1,8 @@
-package parserSecond
+package src
 
 import (
 	"errors"
 	"fmt"
-	"github.com/stoneqi/goexpression"
 	"math"
 	"reflect"
 	"regexp"
@@ -12,22 +11,22 @@ import (
 )
 
 // left
-func leftOperator(left any, right any, parameters goexpression.Parameters) (any, error) {
+func leftOperator(left any, right any, parameters Parameters) (any, error) {
 	return left, nil
 }
 
 // right
-func rightOperator(left any, right any, parameters goexpression.Parameters) (any, error) {
+func rightOperator(left any, right any, parameters Parameters) (any, error) {
 	return right, nil
 }
 
 // 加法： +2=2
-func unAryAddOperator(left any, right any, parameters goexpression.Parameters) (any, error) {
+func unAryAddOperator(left any, right any, parameters Parameters) (any, error) {
 	return right, nil
 }
 
 // 加法： "a"+"b" = "ab"; 1+2=3
-func addOperator(left any, right any, parameters goexpression.Parameters) (any, error) {
+func addOperator(left any, right any, parameters Parameters) (any, error) {
 
 	if isString(left) || isString(right) {
 		return fmt.Sprintf("%v%v", left, right), nil
@@ -42,7 +41,7 @@ func addOperator(left any, right any, parameters goexpression.Parameters) (any, 
 }
 
 // 减法： 1 - 3 = -2
-func subtractOperator(left any, right any, parameters goexpression.Parameters) (any, error) {
+func subtractOperator(left any, right any, parameters Parameters) (any, error) {
 	if isInt64(left) && isInt64(right) {
 		return castToInt64(left) - castToInt64(right), nil
 	}
@@ -53,7 +52,7 @@ func subtractOperator(left any, right any, parameters goexpression.Parameters) (
 }
 
 // 乘法：
-func multiplyOperator(left any, right any, parameters goexpression.Parameters) (any, error) {
+func multiplyOperator(left any, right any, parameters Parameters) (any, error) {
 	if isInt64(left) && isInt64(right) {
 		return castToInt64(left) * castToInt64(right), nil
 	}
@@ -64,7 +63,7 @@ func multiplyOperator(left any, right any, parameters goexpression.Parameters) (
 }
 
 // 除法
-func divideOperator(left any, right any, parameters goexpression.Parameters) (any, error) {
+func divideOperator(left any, right any, parameters Parameters) (any, error) {
 	if isInt64(left) && isInt64(right) {
 		return castToInt64(left) / castToInt64(right), nil
 	}
@@ -80,7 +79,7 @@ func divideOperator(left any, right any, parameters goexpression.Parameters) (an
 //}
 
 // 取模
-func modulusOperator(left any, right any, parameters goexpression.Parameters) (any, error) {
+func modulusOperator(left any, right any, parameters Parameters) (any, error) {
 	if isInt64(left) && isInt64(right) {
 		return castToInt64(left) % castToInt64(right), nil
 	}
@@ -91,7 +90,7 @@ func modulusOperator(left any, right any, parameters goexpression.Parameters) (a
 }
 
 // 大于等于
-func gteOperator(left any, right any, parameters goexpression.Parameters) (any, error) {
+func gteOperator(left any, right any, parameters Parameters) (any, error) {
 	if isString(left) && isString(right) {
 		return left.(string) >= right.(string), nil
 	}
@@ -105,7 +104,7 @@ func gteOperator(left any, right any, parameters goexpression.Parameters) (any, 
 }
 
 // 大于
-func gtOperator(left any, right any, parameters goexpression.Parameters) (any, error) {
+func gtOperator(left any, right any, parameters Parameters) (any, error) {
 	if isString(left) && isString(right) {
 		return left.(string) > right.(string), nil
 	}
@@ -119,7 +118,7 @@ func gtOperator(left any, right any, parameters goexpression.Parameters) (any, e
 }
 
 // 小于等于
-func lteOperator(left any, right any, parameters goexpression.Parameters) (any, error) {
+func lteOperator(left any, right any, parameters Parameters) (any, error) {
 	if isString(left) && isString(right) {
 		return left.(string) <= right.(string), nil
 	}
@@ -133,7 +132,7 @@ func lteOperator(left any, right any, parameters goexpression.Parameters) (any, 
 }
 
 // 小于
-func ltOperator(left any, right any, parameters goexpression.Parameters) (any, error) {
+func ltOperator(left any, right any, parameters Parameters) (any, error) {
 	if isString(left) && isString(right) {
 		return left.(string) < right.(string), nil
 	}
@@ -147,27 +146,27 @@ func ltOperator(left any, right any, parameters goexpression.Parameters) (any, e
 }
 
 // 等于
-func equalOperator(left any, right any, parameters goexpression.Parameters) (any, error) {
+func equalOperator(left any, right any, parameters Parameters) (any, error) {
 	return reflect.DeepEqual(left, right), nil
 }
 
 // 不等于
-func notEqualOperator(left any, right any, parameters goexpression.Parameters) (any, error) {
+func notEqualOperator(left any, right any, parameters Parameters) (any, error) {
 	return !reflect.DeepEqual(left, right), nil
 }
 
 // and
-func andOperator(left any, right any, parameters goexpression.Parameters) (any, error) {
+func andOperator(left any, right any, parameters Parameters) (any, error) {
 	return boolJudge(left) && boolJudge(right), nil
 }
 
 // or
-func orOperator(left any, right any, parameters goexpression.Parameters) (any, error) {
+func orOperator(left any, right any, parameters Parameters) (any, error) {
 	return boolJudge(left) || boolJudge(right), nil
 }
 
 // 取负数
-func negateOperator(left any, right any, parameters goexpression.Parameters) (any, error) {
+func negateOperator(left any, right any, parameters Parameters) (any, error) {
 	if isInt64(right) {
 		return -castToInt64(right), nil
 	}
@@ -178,12 +177,12 @@ func negateOperator(left any, right any, parameters goexpression.Parameters) (an
 }
 
 // 取反
-func invertOperator(left any, right any, parameters goexpression.Parameters) (any, error) {
+func invertOperator(left any, right any, parameters Parameters) (any, error) {
 	return !boolJudge(right), nil
 }
 
 // 按位取反
-func bitwiseNotOperator(left any, right any, parameters goexpression.Parameters) (any, error) {
+func bitwiseNotOperator(left any, right any, parameters Parameters) (any, error) {
 	if isInt64(right) {
 		return ^castToInt64(right), nil
 	}
@@ -207,7 +206,7 @@ func bitwiseNotOperator(left any, right any, parameters goexpression.Parameters)
 //}
 
 // 布尔
-func regexOperator(left any, right any, parameters goexpression.Parameters) (any, error) {
+func regexOperator(left any, right any, parameters Parameters) (any, error) {
 
 	var pattern *regexp.Regexp
 	var err error
@@ -225,7 +224,7 @@ func regexOperator(left any, right any, parameters goexpression.Parameters) (any
 	return pattern.Match([]byte(left.(string))), nil
 }
 
-func notRegexOperator(left any, right any, parameters goexpression.Parameters) (any, error) {
+func notRegexOperator(left any, right any, parameters Parameters) (any, error) {
 
 	ret, err := regexOperator(left, right, parameters)
 	if err != nil {
@@ -236,7 +235,7 @@ func notRegexOperator(left any, right any, parameters goexpression.Parameters) (
 }
 
 // 二元按位或
-func bitwiseOrOperator(left any, right any, parameters goexpression.Parameters) (any, error) {
+func bitwiseOrOperator(left any, right any, parameters Parameters) (any, error) {
 	if isInt64(left) && isInt64(right) {
 		return castToInt64(left) | castToInt64(right), nil
 	}
@@ -247,7 +246,7 @@ func bitwiseOrOperator(left any, right any, parameters goexpression.Parameters) 
 }
 
 // 二元按位且
-func bitwiseAndOperator(left any, right any, parameters goexpression.Parameters) (any, error) {
+func bitwiseAndOperator(left any, right any, parameters Parameters) (any, error) {
 	if isInt64(left) && isInt64(right) {
 		return castToInt64(left) & castToInt64(right), nil
 	}
@@ -258,7 +257,7 @@ func bitwiseAndOperator(left any, right any, parameters goexpression.Parameters)
 }
 
 // 二元按位异或
-func bitwiseXOROperator(left any, right any, parameters goexpression.Parameters) (any, error) {
+func bitwiseXOROperator(left any, right any, parameters Parameters) (any, error) {
 	if isInt64(left) && isInt64(right) {
 		return castToInt64(left) ^ castToInt64(right), nil
 	}
@@ -269,7 +268,7 @@ func bitwiseXOROperator(left any, right any, parameters goexpression.Parameters)
 }
 
 // 位清零
-func bitwiseAndNotOperator(left any, right any, parameters goexpression.Parameters) (any, error) {
+func bitwiseAndNotOperator(left any, right any, parameters Parameters) (any, error) {
 	if isInt64(left) && isInt64(right) {
 		return castToInt64(left) &^ castToInt64(right), nil
 	}
@@ -280,7 +279,7 @@ func bitwiseAndNotOperator(left any, right any, parameters goexpression.Paramete
 }
 
 // 左移
-func leftShiftOperator(left any, right any, parameters goexpression.Parameters) (any, error) {
+func leftShiftOperator(left any, right any, parameters Parameters) (any, error) {
 	if isInt64(left) && isInt64(right) {
 		return castToInt64(left) << castToInt64(right), nil
 	}
@@ -291,7 +290,7 @@ func leftShiftOperator(left any, right any, parameters goexpression.Parameters) 
 }
 
 // 左移
-func rightShiftOperator(left any, right any, parameters goexpression.Parameters) (any, error) {
+func rightShiftOperator(left any, right any, parameters Parameters) (any, error) {
 	if isInt64(left) && isInt64(right) {
 		return castToInt64(left) >> castToInt64(right), nil
 	}
@@ -304,7 +303,7 @@ func rightShiftOperator(left any, right any, parameters goexpression.Parameters)
 // 获取参数值
 func makeParameterOperator(parameterName string) EvaluationOperator {
 
-	return func(left any, right any, parameters goexpression.Parameters) (any, error) {
+	return func(left any, right any, parameters Parameters) (any, error) {
 		value, err := parameters.Get(parameterName)
 		if err != nil {
 			return nil, err
@@ -320,7 +319,7 @@ func makeParameterOperator(parameterName string) EvaluationOperator {
 }
 
 // index
-func indexOperator(left any, right any, parameters goexpression.Parameters) (any, error) {
+func indexOperator(left any, right any, parameters Parameters) (any, error) {
 
 	leftValue := reflect.ValueOf(left)
 
@@ -360,13 +359,19 @@ func indexOperator(left any, right any, parameters goexpression.Parameters) (any
 
 // liter值
 func makeLiteralOperator(literal any) EvaluationOperator {
-	return func(left any, right any, parameters goexpression.Parameters) (any, error) {
+	return func(left any, right any, parameters Parameters) (any, error) {
+		if isInt64(literal) {
+			return castToInt64(literal), nil
+		}
+		if isFloat64(literal) {
+			return castToFloat64(literal), nil
+		}
 		return literal, nil
 	}
 }
 
 // 三元运算符
-func conditionalOperator(left any, right any, parameters goexpression.Parameters) (any, error) {
+func conditionalOperator(left any, right any, parameters Parameters) (any, error) {
 	boolValue := boolJudge(left)
 	conditionalValue, ok := right.([]any)
 	if !ok || len(conditionalValue) != 2 {
@@ -380,7 +385,7 @@ func conditionalOperator(left any, right any, parameters goexpression.Parameters
 }
 
 // 函数执行
-func makeFunctionOperator(left any, right any, parameters goexpression.Parameters) (any, error) {
+func makeFunctionOperator(left any, right any, parameters Parameters) (any, error) {
 	if left == nil {
 		return nil, errors.New("no Function")
 	}
@@ -401,7 +406,7 @@ func makeFunctionOperator(left any, right any, parameters goexpression.Parameter
 }
 
 // 函数执行
-func makeFunction2Operator(left any, right any, parameters goexpression.Parameters) (any, error) {
+func makeFunction2Operator(left any, right any, parameters Parameters) (any, error) {
 	if left == nil {
 		return nil, errors.New("no Function")
 	}
@@ -495,7 +500,7 @@ func makeFunction2Operator(left any, right any, parameters goexpression.Paramete
 //}
 
 // 函数参数
-func makeSliceOperator(left any, right any, parameters goexpression.Parameters) (any, error) {
+func makeSliceOperator(left any, right any, parameters Parameters) (any, error) {
 	rightValue, ok := right.([]any)
 	if !ok {
 		return nil, errors.New("slice index is not array")
@@ -648,7 +653,7 @@ func typeConvertParams(method reflect.Value, params []reflect.Value) ([]reflect.
 
 func makeAccessOperator(pair string) EvaluationOperator {
 
-	return func(left any, right any, parameters goexpression.Parameters) (ret any, err error) {
+	return func(left any, right any, parameters Parameters) (ret any, err error) {
 
 		value := left
 		// while this library generally tries to handle panic-inducing cases on its own,
@@ -700,7 +705,7 @@ func makeAccessorOperator(pair []string) EvaluationOperator {
 
 	reconstructed := strings.Join(pair, ".")
 
-	return func(left any, right any, parameters goexpression.Parameters) (ret any, err error) {
+	return func(left any, right any, parameters Parameters) (ret any, err error) {
 
 		var params []reflect.Value
 
@@ -826,7 +831,7 @@ func makeAccessorOperator(pair []string) EvaluationOperator {
 //}
 
 // in 函数
-func inOperator(left any, right any, parameters goexpression.Parameters) (any, error) {
+func inOperator(left any, right any, parameters Parameters) (any, error) {
 	//leftValue := reflect.ValueOf(left)
 	rightValue := reflect.ValueOf(right)
 	if rightValue.Kind() == reflect.Array || rightValue.Kind() == reflect.Slice {

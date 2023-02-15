@@ -1,15 +1,14 @@
-package parserSecond
+package src
 
 import (
 	"errors"
 	"fmt"
-	"github.com/stoneqi/goexpression"
 	"sync"
 )
 
 const shortCircuitHolder int = -1
 
-type EvaluableExpression struct {
+type EvaluableExpressionContext struct {
 	singleExpr   *evaluationNode
 	singleString string
 	ChecksTypes  bool
@@ -17,33 +16,36 @@ type EvaluableExpression struct {
 	IsDebug      bool
 	expr         sync.Map
 	exprString   sync.Map
+	parameters   Parameters
 }
 
-func NewEvaluableExpression(stage *evaluationNode) *EvaluableExpression {
-	return &EvaluableExpression{
-		singleExpr: stage}
+func NewEvaluableExpression() *EvaluableExpressionContext {
+	return &EvaluableExpressionContext{}
 }
 
-func (ee *EvaluableExpression) AddExpr(key any, expr string) (err error) {
-	defer func() {
-		if errRec := recover(); errRec != nil {
-			err = errors.New(fmt.Sprintf("panic: %+v", errRec))
-			return
-		}
-		err = errors.New("panic: no err info")
-		return
-	}()
-	stageTemp, err := VisitorParserString(expr)
+func (ee *EvaluableExpressionContext) AddExpr(key any, expr string) (err error) {
+	return ee.AddExprWithParameters(key, expr, MapParameters(map[string]any{}))
+}
+
+func (ee *EvaluableExpressionContext) AddExprWithMap(key any, expr string, parameters map[string]any) (err error) {
+	return ee.AddExprWithParameters(key, expr, MapParameters(parameters))
+}
+
+func (ee *EvaluableExpressionContext) AddExprWithParameters(key any, expr string, parameters Parameters) (err error) {
+	ee.parameters = parameters
+
+	stageTemp, err := VisitorParserString(ee, expr)
 	if err != nil {
 		return err
 	}
+
 	stageTemp = elideLiterals(stageTemp)
 	ee.expr.Store(key, stageTemp)
 	ee.exprString.Store(key, expr)
 	return nil
 }
 
-func (ee *EvaluableExpression) EvalAllExpr(parameters goexpression.Parameters) (map[any]any, map[any]error) {
+func (ee *EvaluableExpressionContext) EvalAllExpr(parameters Parameters) (map[any]any, map[any]error) {
 	ret := make(map[any]any, 0)
 	errs := make(map[any]error, 0)
 	ee.expr.Range(func(key, value any) bool {
@@ -58,15 +60,15 @@ func (ee *EvaluableExpression) EvalAllExpr(parameters goexpression.Parameters) (
 	return ret, errs
 }
 
-func (ee *EvaluableExpression) EvaluateAllExpr(parameters map[string]any) (map[any]any, map[any]error) {
+func (ee *EvaluableExpressionContext) EvaluateAllExpr(parameters map[string]any) (map[any]any, map[any]error) {
 	return ee.EvalAllExpr(MapParameters(parameters))
 }
 
-func (ee *EvaluableExpression) EvaluateExprByKey(key any, parameters map[string]any) (any, error) {
+func (ee *EvaluableExpressionContext) EvaluateExprByKey(key any, parameters map[string]any) (any, error) {
 	return ee.EvalExprByKey(key, MapParameters(parameters))
 }
 
-func (ee *EvaluableExpression) EvalExprByKey(key any, parameters goexpression.Parameters) (any, error) {
+func (ee *EvaluableExpressionContext) EvalExprByKey(key any, parameters Parameters) (any, error) {
 	if expr, ok := ee.expr.Load(key); ok {
 		tempExpr := expr.(*evaluationNode)
 		return ee.evaluateStage(tempExpr, parameters)
@@ -75,16 +77,8 @@ func (ee *EvaluableExpression) EvalExprByKey(key any, parameters goexpression.Pa
 	}
 }
 
-func (ee *EvaluableExpression) AddSingleExpr(expr string) (err error) {
-	defer func() {
-		if errRec := recover(); errRec != nil {
-			err = errors.New(fmt.Sprintf("panic: %+v", errRec))
-			return
-		}
-		err = errors.New("panic: no err info")
-		return
-	}()
-	ee.singleExpr, err = VisitorParserString(expr)
+func (ee *EvaluableExpressionContext) AddSingleExpr(expr string) (err error) {
+	ee.singleExpr, err = VisitorParserString(ee, expr)
 	if err != nil {
 		return err
 	}
@@ -92,13 +86,13 @@ func (ee *EvaluableExpression) AddSingleExpr(expr string) (err error) {
 	return nil
 }
 
-func (ee *EvaluableExpression) EvalSingleString(parameters goexpression.Parameters) (any, error) {
+func (ee *EvaluableExpressionContext) EvalSingleString(parameters Parameters) (any, error) {
 	return ee.evaluateStage(ee.singleExpr, parameters)
 }
-func (ee *EvaluableExpression) EvaluateSingleString(parameters map[string]any) (any, error) {
+func (ee *EvaluableExpressionContext) EvaluateSingleString(parameters map[string]any) (any, error) {
 	return ee.evaluateStage(ee.singleExpr, MapParameters(parameters))
 }
-func (ee *EvaluableExpression) String(key any) (string, error) {
+func (ee *EvaluableExpressionContext) String(key any) (string, error) {
 	if key != nil {
 		if value, ok := ee.exprString.Load(key); ok {
 			return value.(string), nil
@@ -111,20 +105,25 @@ func (ee *EvaluableExpression) String(key any) (string, error) {
 	return ee.singleString, nil
 }
 
-func (ee *EvaluableExpression) evalString(expression string, parameters goexpression.Parameters) (any, error) {
-	ee.singleExpr, _ = VisitorParserString(expression)
+func (ee *EvaluableExpressionContext) evalStringTest(expression string, parameters Parameters) (any, error) {
+	ee.singleExpr, _ = VisitorParserString(ee, expression)
 	ee.singleExpr = elideLiterals(ee.singleExpr)
 	return ee.evaluateStage(ee.singleExpr, parameters)
 }
+func (ee *EvaluableExpressionContext) evalStringTest2(expression string, parameters Parameters, parameters2 Parameters) (any, error) {
+	ee.parameters = parameters
+	ee.singleExpr, _ = VisitorParserString(ee, expression)
+	ee.singleExpr = elideLiterals(ee.singleExpr)
+	return ee.evaluateStage(ee.singleExpr, parameters2)
+}
 
-func (ee *EvaluableExpression) evaluateStage(stage *evaluationNode, parameters goexpression.Parameters) (ret any, err error) {
+func (ee *EvaluableExpressionContext) evaluateStage(stage *evaluationNode, parameters Parameters) (ret any, err error) {
 
 	defer func() {
 		if errRec := recover(); errRec != nil {
 			err = errors.New(fmt.Sprintf("panic: %+v", errRec))
 			return
 		}
-		err = errors.New("panic: no err info")
 		return
 	}()
 	var left, right any
