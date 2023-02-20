@@ -1,5 +1,5 @@
 // Package goexpression provides ...
-package src
+package goexpression
 
 type GoExpression interface {
 	// AddExpr 添加表达式，key为表达式唯一标识，expr为表达式

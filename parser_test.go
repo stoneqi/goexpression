@@ -1,5 +1,5 @@
 // Package main provides ...
-package src
+package goexpression
 
 import (
 	"testing"

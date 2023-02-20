@@ -1,4 +1,4 @@
-package src
+package goexpression
 
 //go:generate stringer -type=OperatorSymbol
 type OperatorSymbol uint8

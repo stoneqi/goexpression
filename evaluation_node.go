@@ -1,5 +1,5 @@
 // Package main provides ...
-package src
+package goexpression
 
 type EvaluationOperator func(left any, right any, parameters Parameters) (any, error)
 
