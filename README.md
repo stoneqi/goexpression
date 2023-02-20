@@ -2,13 +2,20 @@
 
 ## 快速开始
 ```golang
-    goExpr := NewGoExpression()
-    _ = goExpr.AddSingleExpr("1+3*4-num1*num2")
-    ret, _ := goExpr.EvalSingleString(map[string]any{
-        "num1": 10,
-        "num2": 4,
-    })
-    fmt.Printf("%v\n", ret)
+package main
+
+import "fmt"
+import "github.com/stoneqi/goexpression"
+
+func main() {
+	goExpr := goexpression.NewGoExpression()
+	_ = goExpr.AddSingleExpr("1+3*4-num1*num2")
+	ret, _ := goExpr.EvalSingleString(map[string]any{
+		"num1": 10,
+		"num2": 4,
+	})
+	fmt.Printf("%v\n", ret)
+}
 
 ```
 
