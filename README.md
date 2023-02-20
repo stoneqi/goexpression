@@ -1,5 +1,17 @@
 # goexpression
 
+## 快速开始
+```golang
+    goExpr := NewGoExpression()
+    _ = goExpr.AddSingleExpr("1+3*4-num1*num2")
+    ret, _ := goExpr.EvalSingleString(map[string]any{
+        "num1": 10,
+        "num2": 4,
+    })
+    fmt.Printf("%v\n", ret)
+
+```
+
 ## 字面量数据类型
 - `nil` 空 
 - `bool` 布尔，`TRUE`，`True`，`true`，`false`，`False`，`FALSE`

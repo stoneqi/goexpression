@@ -16,7 +16,6 @@ type EvaluableExpressionContext struct {
 	IsDebug      bool
 	expr         sync.Map
 	exprString   sync.Map
-	parameters   Parameters
 }
 
 func NewEvaluableExpression() *EvaluableExpressionContext {
@@ -24,17 +23,43 @@ func NewEvaluableExpression() *EvaluableExpressionContext {
 }
 
 func (ee *EvaluableExpressionContext) AddExpr(key any, expr string) (err error) {
+	if key == nil {
+		return errors.New("key is nil")
+	}
 	return ee.AddExprWithParameters(key, expr, MapParameters(map[string]any{}))
+}
+func (ee *EvaluableExpressionContext) DeleteExpr(key any) {
+	if key == nil {
+		return
+	}
+	ee.exprString.Delete(key)
+	ee.expr.Delete(key)
+	return
+}
+func (ee *EvaluableExpressionContext) DeleteAll() {
+	ee.singleExpr = nil
+	ee.singleString = ""
+	ee.recordStep = nil
+	ee.expr = sync.Map{}
+	ee.exprString = sync.Map{}
+	return
 }
 
 func (ee *EvaluableExpressionContext) AddExprWithMap(key any, expr string, parameters map[string]any) (err error) {
+	if key == nil {
+		return errors.New("key is nil")
+	}
 	return ee.AddExprWithParameters(key, expr, MapParameters(parameters))
 }
 
 func (ee *EvaluableExpressionContext) AddExprWithParameters(key any, expr string, parameters Parameters) (err error) {
-	ee.parameters = parameters
+	if key == nil {
+		return errors.New("key is nil")
+	}
 
-	stageTemp, err := VisitorParserString(ee, expr)
+	stageTemp, err := VisitorParserString(&ParserStringContext{
+		parameters: parameters,
+	}, expr)
 	if err != nil {
 		return err
 	}
@@ -45,7 +70,7 @@ func (ee *EvaluableExpressionContext) AddExprWithParameters(key any, expr string
 	return nil
 }
 
-func (ee *EvaluableExpressionContext) EvalAllExpr(parameters Parameters) (map[any]any, map[any]error) {
+func (ee *EvaluableExpressionContext) EvalAllExprWithParameters(parameters Parameters) (map[any]any, map[any]error) {
 	ret := make(map[any]any, 0)
 	errs := make(map[any]error, 0)
 	ee.expr.Range(func(key, value any) bool {
@@ -60,15 +85,18 @@ func (ee *EvaluableExpressionContext) EvalAllExpr(parameters Parameters) (map[an
 	return ret, errs
 }
 
-func (ee *EvaluableExpressionContext) EvaluateAllExpr(parameters map[string]any) (map[any]any, map[any]error) {
-	return ee.EvalAllExpr(MapParameters(parameters))
+func (ee *EvaluableExpressionContext) EvalAllExpr(parameters map[string]any) (map[any]any, map[any]error) {
+	return ee.EvalAllExprWithParameters(MapParameters(parameters))
 }
 
-func (ee *EvaluableExpressionContext) EvaluateExprByKey(key any, parameters map[string]any) (any, error) {
-	return ee.EvalExprByKey(key, MapParameters(parameters))
+func (ee *EvaluableExpressionContext) EvalExprByKey(key any, parameters map[string]any) (any, error) {
+	return ee.EvalExprByKeyWithParameters(key, MapParameters(parameters))
 }
 
-func (ee *EvaluableExpressionContext) EvalExprByKey(key any, parameters Parameters) (any, error) {
+func (ee *EvaluableExpressionContext) EvalExprByKeyWithParameters(key any, parameters Parameters) (any, error) {
+	if key == nil {
+		return nil, errors.New("key is nil")
+	}
 	if expr, ok := ee.expr.Load(key); ok {
 		tempExpr := expr.(*evaluationNode)
 		return ee.evaluateStage(tempExpr, parameters)
@@ -78,7 +106,8 @@ func (ee *EvaluableExpressionContext) EvalExprByKey(key any, parameters Paramete
 }
 
 func (ee *EvaluableExpressionContext) AddSingleExpr(expr string) (err error) {
-	ee.singleExpr, err = VisitorParserString(ee, expr)
+
+	ee.singleExpr, err = VisitorParserString(&ParserStringContext{}, expr)
 	if err != nil {
 		return err
 	}
@@ -86,11 +115,11 @@ func (ee *EvaluableExpressionContext) AddSingleExpr(expr string) (err error) {
 	return nil
 }
 
-func (ee *EvaluableExpressionContext) EvalSingleString(parameters Parameters) (any, error) {
+func (ee *EvaluableExpressionContext) EvalSingleStringWithParameters(parameters Parameters) (any, error) {
 	return ee.evaluateStage(ee.singleExpr, parameters)
 }
-func (ee *EvaluableExpressionContext) EvaluateSingleString(parameters map[string]any) (any, error) {
-	return ee.evaluateStage(ee.singleExpr, MapParameters(parameters))
+func (ee *EvaluableExpressionContext) EvalSingleString(parameters map[string]any) (any, error) {
+	return ee.EvalSingleStringWithParameters(MapParameters(parameters))
 }
 func (ee *EvaluableExpressionContext) String(key any) (string, error) {
 	if key != nil {
@@ -105,14 +134,24 @@ func (ee *EvaluableExpressionContext) String(key any) (string, error) {
 	return ee.singleString, nil
 }
 
+func (ee *EvaluableExpressionContext) AllString() map[any]string {
+	ret := make(map[any]string, 0)
+	ee.exprString.Range(func(key, value any) bool {
+		ret[key] = value.(string)
+		return true
+	})
+	return ret
+}
+
 func (ee *EvaluableExpressionContext) evalStringTest(expression string, parameters Parameters) (any, error) {
-	ee.singleExpr, _ = VisitorParserString(ee, expression)
+	ee.singleExpr, _ = VisitorParserString(&ParserStringContext{}, expression)
 	ee.singleExpr = elideLiterals(ee.singleExpr)
 	return ee.evaluateStage(ee.singleExpr, parameters)
 }
 func (ee *EvaluableExpressionContext) evalStringTest2(expression string, parameters Parameters, parameters2 Parameters) (any, error) {
-	ee.parameters = parameters
-	ee.singleExpr, _ = VisitorParserString(ee, expression)
+	ee.singleExpr, _ = VisitorParserString(&ParserStringContext{
+		parameters: parameters,
+	}, expression)
 	ee.singleExpr = elideLiterals(ee.singleExpr)
 	return ee.evaluateStage(ee.singleExpr, parameters2)
 }

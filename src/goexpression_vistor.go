@@ -496,7 +496,11 @@ func (ge *goExpreesionVisitor) VisitString_(ctx *parser.String_Context) any {
 	return node
 }
 
-func VisitorParserString(ctx *EvaluableExpressionContext, expression string) (node *evaluationNode, err error) {
+type ParserStringContext struct {
+	parameters Parameters
+}
+
+func VisitorParserString(ctx *ParserStringContext, expression string) (node *evaluationNode, err error) {
 	defer func() {
 		if errRec := recover(); errRec != nil {
 			err = errors.New(fmt.Sprintf("panic: %+v", errRec))
