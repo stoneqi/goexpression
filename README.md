@@ -1,4 +1,5 @@
 # goexpression
+> 一个`Golang`语言支持动态运行规则表达式的库。
 
 本项目基于 [govaluate](https://github.com/Knetic/govaluate) 和 [antlr4](https://github.com/antlr/antlr4) 
 ## 特性
@@ -103,6 +104,7 @@ type GoExpression interface {
 ### 取值操作
 - `index`：索引，`{1,3,"AA"}[2]`
 - `slice`: 切片， `{1,3,"AA"}[1,2]`
+- `.`: 访问， 访问结构体或MAP结构。 `A.B.C`
 
 ### 函数调用
 - `funName(argum)`。支持函数调用，函数可以在表达式执行时通过接口的参数传入。对函数参数不做限制，要求必须有返回值，返回值为2个是，第二个需要是`error`类型， 执行函数时，返回error不为空，则中断表达式执行，返回错误。
