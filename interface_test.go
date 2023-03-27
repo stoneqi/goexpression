@@ -83,6 +83,28 @@ func TestGoExpression(t *testing.T) {
 				"test2": false,
 			},
 		},
+		{
+			name: "multi_expr",
+			expr: map[string]string{
+				"test1": "a+b",
+				"test2": "b > c",
+				"test3": "a > c",
+			},
+			param: map[string]any{
+				"a": 1,
+				"b": 2,
+				"c": 3,
+			},
+			want: map[string]any{
+				"test1": int64(1 + 2),
+				"test2": bool(2 > 3),
+				"test3": bool(1 > 3),
+			},
+			wantErr: map[string]bool{
+				"test1": false,
+				"test2": false,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

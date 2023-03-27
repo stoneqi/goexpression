@@ -157,14 +157,6 @@ func (ee *EvaluableExpressionContext) evalStringTest2(expression string, paramet
 }
 
 func (ee *EvaluableExpressionContext) evaluateStage(stage *evaluationNode, parameters Parameters) (ret any, err error) {
-
-	defer func() {
-		if errRec := recover(); errRec != nil {
-			err = errors.New(fmt.Sprintf("panic: %+v", errRec))
-			return
-		}
-		return
-	}()
 	var left, right any
 
 	if stage.LeftOperator != nil {

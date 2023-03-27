@@ -2089,6 +2089,119 @@ func TestEvaluableExpressionContext_evalStringTest2(t *testing.T) {
 			want:    int64(13),
 			wantErr: false,
 		},
+
+		{
+			name: "simple addition",
+			args: args{
+				expression:  "2 + 3",
+				parameters:  MapParameters{},
+				parameters2: MapParameters{},
+			},
+			want:    int(5),
+			wantErr: false,
+		},
+		{
+			name: "complex math operations",
+			args: args{
+				expression:  "10 * 5 - 20 / 4",
+				parameters:  MapParameters{},
+				parameters2: MapParameters{},
+			},
+			want:    float64(47.5),
+			wantErr: false,
+		},
+		{
+			name: "basic string manipulation",
+			args: args{
+				expression:  "\"hello \" + \"world\"",
+				parameters:  MapParameters{},
+				parameters2: MapParameters{},
+			},
+			want:    "hello world",
+			wantErr: false,
+		},
+		{
+			name: "array indexing",
+			args: args{
+				expression: "arr[2]",
+				parameters: MapParameters{
+					"arr": []int{1, 2, 3},
+				},
+				parameters2: MapParameters{},
+			},
+			want:    3,
+			wantErr: false,
+		},
+		{
+			name: "map indexing",
+			args: args{
+				expression: "m[\"key\"]",
+				parameters: MapParameters{
+					"m": map[string]int{
+						"key": 42,
+					},
+				},
+				parameters2: MapParameters{},
+			},
+			want:    42,
+			wantErr: false,
+		},
+		{
+			name: "function call",
+			args: args{
+				expression: "len(\"abc\")",
+				parameters: MapParameters{
+					"len": func(string2 string) int { return len(string2) },
+				},
+				parameters2: MapParameters{},
+			},
+			want:    int64(3),
+			wantErr: false,
+		},
+		{
+			name: "float division with precision",
+			args: args{
+				expression:  "1.0/3.0",
+				parameters:  MapParameters{},
+				parameters2: MapParameters{},
+			},
+			want:    float64(0.3333333333333333),
+			wantErr: false,
+		},
+		{
+			name: "nested parentheses",
+			args: args{
+				expression:  "((1 + 2) * 3)",
+				parameters:  MapParameters{},
+				parameters2: MapParameters{},
+			},
+			want:    9,
+			wantErr: false,
+		},
+		{
+			name: "missing function call parameter",
+			args: args{
+				expression:  "len()",
+				parameters:  MapParameters{},
+				parameters2: MapParameters{},
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "array and variable addition",
+			args: args{
+				expression: "3 + 5 + a[2]",
+				parameters: MapParameters{
+					"a": []int{4, 3, 5},
+				},
+				parameters2: MapParameters{
+					//"a": []int{4, 3, 5},
+				},
+			},
+			want:    int64(13),
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
