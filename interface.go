@@ -2,6 +2,7 @@
 package goexpression
 
 type GoExpression interface {
+
 	// AddExpr 添加表达式，key为表达式唯一标识，expr为表达式
 	AddExpr(key any, expr string) error
 	// AddExprWithParameters 包含预参数，如果表达式中使用的变量在parameters中存在，则会预选读取编译
@@ -16,12 +17,6 @@ type GoExpression interface {
 	EvalExprByKeyWithParameters(key any, parameters Parameters) (any, error)
 	// EvalExprByKey 同EvalExprByKeyWithParameters，包装map到Parameters
 	EvalExprByKey(key any, parameters map[string]any) (any, error)
-	// AddSingleExpr 添加单个表达式
-	AddSingleExpr(expr string) error
-	// EvalSingleStringWithParameters 执行添加的单个表达式，返回该表达式的执行结果或错误
-	EvalSingleStringWithParameters(parameters Parameters) (any, error)
-	// EvalSingleString EvalSingleStringWithParameters，包装map到Parameters
-	EvalSingleString(parameters map[string]any) (any, error)
 	// DeleteExpr 删除包含key值的表达式
 	DeleteExpr(key any)
 	// DeleteAll 删除所有表达式
@@ -30,6 +25,20 @@ type GoExpression interface {
 	String(key any) (string, error)
 	// AllString 返回所有表达式
 	AllString() map[any]string
+}
+
+type Evaluator interface {
+	Parse(expression string, inputs Parameters) error
+	Evaluate(inputs Parameters) (interface{}, error)
+	// Eval 添加并执行表达式
+	Eval(expression string, data map[string]any) (any, error)
+	// EvalWithParameters 添加并执行表达式
+	EvalWithParameters(expression string, data Parameters) (any, error)
+}
+
+// SyntaxChecker 语法检查器接口
+type SyntaxChecker interface {
+	SyntaxCheck(expression string) error
 }
 
 type Parameters interface {

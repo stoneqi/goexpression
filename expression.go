@@ -22,6 +22,19 @@ func NewEvaluableExpression() *EvaluableExpressionContext {
 	return &EvaluableExpressionContext{}
 }
 
+func (ee *EvaluableExpressionContext) Eval(expression string, data map[string]any) (any, error) {
+	return ee.EvalWithParameters(expression, MapParameters(data))
+}
+
+func (ee *EvaluableExpressionContext) EvalWithParameters(expression string, data Parameters) (any, error) {
+	singleExpr, err := VisitorParserString(&ParserStringContext{}, expression)
+	if err != nil {
+		return nil, err
+	}
+	singleExpr = elideLiterals(singleExpr)
+	return ee.evaluateStage(singleExpr, data)
+}
+
 func (ee *EvaluableExpressionContext) AddExpr(key any, expr string) (err error) {
 	if key == nil {
 		return errors.New("key is nil")
@@ -105,9 +118,11 @@ func (ee *EvaluableExpressionContext) EvalExprByKeyWithParameters(key any, param
 	}
 }
 
-func (ee *EvaluableExpressionContext) AddSingleExpr(expr string) (err error) {
+func (ee *EvaluableExpressionContext) Parse(expr string, inputs Parameters) (err error) {
 
-	ee.singleExpr, err = VisitorParserString(&ParserStringContext{}, expr)
+	ee.singleExpr, err = VisitorParserString(&ParserStringContext{
+		parameters: inputs,
+	}, expr)
 	if err != nil {
 		return err
 	}
@@ -115,12 +130,18 @@ func (ee *EvaluableExpressionContext) AddSingleExpr(expr string) (err error) {
 	return nil
 }
 
-func (ee *EvaluableExpressionContext) EvalSingleStringWithParameters(parameters Parameters) (any, error) {
+func (ee *EvaluableExpressionContext) Evaluate(parameters Parameters) (any, error) {
 	return ee.evaluateStage(ee.singleExpr, parameters)
 }
-func (ee *EvaluableExpressionContext) EvalSingleString(parameters map[string]any) (any, error) {
-	return ee.EvalSingleStringWithParameters(MapParameters(parameters))
+
+// TODO 待实现语法检测
+func (ee *EvaluableExpressionContext) SyntaxCheck(expression string) error {
+	return nil
 }
+
+//	func (ee *EvaluableExpressionContext) EvalSingleString(parameters map[string]any) (any, error) {
+//		return ee.EvalSingleStringWithParameters(MapParameters(parameters))
+//	}
 func (ee *EvaluableExpressionContext) String(key any) (string, error) {
 	if key != nil {
 		if value, ok := ee.exprString.Load(key); ok {
