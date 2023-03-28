@@ -1,7 +1,7 @@
 // Package goexpression provides ...
 package goexpression
 
-type GoExpression interface {
+type goExpression interface {
 
 	// AddExpr 添加表达式，key为表达式唯一标识，expr为表达式
 	AddExpr(key any, expr string) error
@@ -27,9 +27,11 @@ type GoExpression interface {
 	AllString() map[any]string
 }
 
-type Evaluator interface {
+type GoEvaluator interface {
+	// Parse 编译传入的表达式
 	Parse(expression string, inputs Parameters) error
-	Evaluate(inputs Parameters) (interface{}, error)
+	// Evaluate 执行编译好的表达式
+	Evaluate(inputs Parameters) (any, error)
 	// Eval 添加并执行表达式
 	Eval(expression string, data map[string]any) (any, error)
 	// EvalWithParameters 添加并执行表达式
@@ -45,6 +47,11 @@ type Parameters interface {
 	Get(name string) (any, error)
 }
 
-func NewGoExpression() GoExpression {
+// 内部测试使用
+func newGoExpression() goExpression {
+	return NewEvaluableExpression()
+}
+
+func NewGoEvaluator() GoEvaluator {
 	return NewEvaluableExpression()
 }

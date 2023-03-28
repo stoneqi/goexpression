@@ -129,12 +129,52 @@ func TestGoExpression(t *testing.T) {
 	}
 }
 
-func ExampleEvalSingleString() {
-	goExpr := NewGoExpression()
-	_ = goExpr.AddSingleExpr("1+3*4-num1*num2")
-	ret, _ := goExpr.EvalSingleString(map[string]any{
-		"num1": 10,
-		"num2": 4,
-	})
-	fmt.Printf("%v\n", ret)
+func TestExampleEvalSingleString(t *testing.T) {
+	goExpr := NewGoEvaluator()
+	err := goExpr.Parse("1+1", nil)
+	if err != nil {
+		panic("表达式有误：" + err.Error())
+	}
+
+	// 计算表达式结果
+	result, err := goExpr.Evaluate(nil)
+
+	if err != nil {
+		panic("计算结果出错：" + err.Error())
+	}
+
+	fmt.Println(result) // 输出：2
+}
+
+func TestExampleEvalSingleString2(t *testing.T) {
+
+	var MyFunction = func() (interface{}, error) {
+		return "Hello World", nil
+	}
+	goExpr := NewGoEvaluator()
+	// 编译表达式
+	err := goExpr.Parse("MyFunction()", nil)
+	if err != nil {
+		panic("表达式有误：" + err.Error())
+	}
+	parameters := make(map[string]any, 0)
+	parameters["MyFunction"] = MyFunction
+	// 计算表达式结果
+	result, err := goExpr.Evaluate(MapParameters(parameters))
+
+	if err != nil {
+		panic("计算结果出错：" + err.Error())
+	}
+
+	fmt.Println(result) // 输出：Hello World
+}
+
+func TestExampleEvalSingleString3(t *testing.T) {
+	goExpr := NewGoEvaluator()
+	// 编译表达式并执行
+	result, err := goExpr.Eval("1+1", nil)
+	if err != nil {
+		panic("出错：" + err.Error())
+	}
+	fmt.Println(result) // 输出：2
 }
