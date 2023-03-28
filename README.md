@@ -64,17 +64,18 @@ import "fmt"
 import "github.com/stoneqi/goexpression"
 
 func main() {
-	var MyFunction = func() (interface{}, error) {
-		return "Hello World", nil
+	var MyFunction = func(a string) (interface{}, error) {
+		return a, nil
 	}
 	goExpr := goexpression.NewGoEvaluator()
 	// 编译表达式
-	err := goExpr.Parse("MyFunction()", nil)
+	err := goExpr.Parse("MyFunction(hello)", nil)
 	if err != nil {
 		panic("表达式有误：" + err.Error())
 	}
 	parameters := make(map[string]any, 0)
 	parameters["MyFunction"] = MyFunction
+	parameters["hello"] = "Hello World"
 	// 计算表达式结果
 	result, err := goExpr.Evaluate(goexpression.MapParameters(parameters))
 
