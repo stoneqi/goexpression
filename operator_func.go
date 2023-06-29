@@ -484,21 +484,6 @@ func makeFunction2Operator(left any, right any, parameters Parameters) (any, err
 	//}
 }
 
-//// 函数执行
-//func makeFuncOperator(function ExpressionFunction) EvaluationOperator {
-//	return func(left interface{}, right interface{}, parameters Parameters) (interface{}, error) {
-//		res := make([]interface{}, 0, len(expression))
-//		for _, node := range expression {
-//			singleExpr, err := evaluateStage(node, parameters)
-//			if err != nil {
-//				return nil, err
-//			}
-//			res = append(res, singleExpr)
-//		}
-//		return res, nil
-//	}
-//}
-
 // 函数参数
 func makeSliceOperator(left any, right any, parameters Parameters) (any, error) {
 	rightValue, ok := right.([]any)

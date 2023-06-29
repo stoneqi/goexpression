@@ -236,14 +236,11 @@ func (ge *goExpreesionVisitor) VisitExpression(ctx *parser2.ExpressionContext) a
 		if ctx.LOGICAL_OR() != nil || ctx.EN_OR() != nil {
 			node.Symbol = LOGICAL_OR
 			node.Operator = orOperator
-			//node.LeftTypeCheck = isBool
-			//node.RightTypeCheck = isBool
 			node.TypeCheck = nil
 		}
 		if ctx.QUESTION() != nil {
 			node.Symbol = QUESTION
 			node.Operator = conditionalOperator
-			//node.LeftTypeCheck = isBool
 			node.TypeErrorFormat = leftNode.GetText() + " value is not boolean "
 		}
 		if ctx.EN_IN() != nil {

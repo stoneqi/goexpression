@@ -197,20 +197,6 @@ func (ee *EvaluableExpressionContext) evaluateStage(stage *evaluationNode, param
 			if left == true {
 				return true, nil
 			}
-			//case COALESCE:
-			//	if left != nil {
-			//		return left, nil
-			//	}
-
-			//case TERNARY_TRUE:
-			//	if left == false {
-			//		right = shortCircuitHolder
-			//	}
-			//case TERNARY_FALSE:
-			//	if left != nil {
-			//		right = shortCircuitHolder
-			//	}
-			//}
 		}
 	}
 
@@ -243,7 +229,7 @@ func (ee *EvaluableExpressionContext) evaluateStage(stage *evaluationNode, param
 				return nil, err
 			}
 		} else {
-			// special case where the type check needs to know both sides to determine if the Operator can handle it
+
 			if !stage.TypeCheck(left, right) {
 				errorMsg := fmt.Sprintf("double check: %+v, value:%v, string:%v", stage.TypeErrorFormat, left, stage.Symbol.String())
 				return nil, errors.New(errorMsg)
