@@ -30,6 +30,32 @@ func TestGoExpression(t *testing.T) {
 		{
 			name: "multi_expr",
 			expr: map[string]string{
+				"test1": "-1+2",
+			},
+			param: nil,
+			want: map[string]any{
+				"test1": int64(-1 + 2),
+			},
+			wantErr: map[string]bool{
+				"test1": false,
+			},
+		},
+		{
+			name: "multi_expr",
+			expr: map[string]string{
+				"test1": "-0+2",
+			},
+			param: nil,
+			want: map[string]any{
+				"test1": int64(-0 + 2),
+			},
+			wantErr: map[string]bool{
+				"test1": false,
+			},
+		},
+		{
+			name: "multi_expr",
+			expr: map[string]string{
 				"test1": "1+2",
 				"test2": "3+4",
 			},
